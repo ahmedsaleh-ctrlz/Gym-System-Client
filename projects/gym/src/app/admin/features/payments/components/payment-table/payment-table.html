@@ -1,0 +1,175 @@
+<section class="workspace-card">
+  <div class="workspace-toolbar">
+    <div>
+      <span class="eyebrow">THE MONEY TRAIL</span>
+      <h2>Payment ledger</h2>
+    </div>
+    <div class="toolbar-actions">
+      <div class="search-box">
+        <i class="pi pi-search"></i
+        ><input
+          pInputText
+          type="search"
+          placeholder="Search member or payment"
+          [value]="searchTerm()"
+          (input)="onSearch($event)"
+        />
+      </div>
+      <p-button
+        [icon]="sortDirection() === 'desc' ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up'"
+        [label]="sortDirection() === 'desc' ? 'Newest first' : 'Oldest first'"
+        [text]="true"
+        severity="secondary"
+        (onClick)="sort.emit()"
+      />
+      <p-button
+        icon="pi pi-sliders-h"
+        label="Filters"
+        [outlined]="filtersVisible()"
+        [text]="!filtersVisible()"
+        severity="secondary"
+        (onClick)="toggleFilters.emit()"
+      />
+      <p-button
+        icon="pi pi-refresh"
+        [text]="true"
+        severity="secondary"
+        ariaLabel="Refresh payments"
+        (onClick)="refresh.emit()"
+      />
+    </div>
+  </div>
+  @if (filtersVisible()) {
+    <div class="filter-strip">
+      <div class="filter-field">
+        <label>Status</label
+        ><select [value]="statusFilter()" (change)="onStatusFilter($event)">
+          <option value="">All statuses</option>
+          <option value="Paid">Paid</option>
+          <option value="Pending">Pending</option>
+          <option value="Failed">Failed</option>
+          <option value="Refunded">Refunded</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label>Payment method</label
+        ><select [value]="paymentMethodFilter() ?? ''" (change)="onMethodFilter($event)">
+          <option value="">All methods</option>
+          @for (method of paymentMethods(); track method.value) {
+            <option [value]="method.value">{{ method.label }}</option>
+          }
+        </select>
+      </div>
+      <p-button label="Clear" severity="secondary" [text]="true" (onClick)="clearFilters.emit()" />
+    </div>
+  }
+  <p-table
+    [value]="payments()"
+    [loading]="loading()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="pageSize()"
+    [totalRecords]="total()"
+    [first]="(pageNumber() - 1) * pageSize()"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
+    (onPage)="page.emit($event.first / $event.rows + 1)"
+  >
+    <ng-template #header
+      ><tr>
+        <th>Payment</th>
+        <th>Member</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Status</th>
+        <th>Paid at</th>
+        <th class="actions-column">Actions</th>
+      </tr></ng-template
+    >
+    <ng-template #body let-payment
+      ><tr>
+        <td>
+          <div class="payment-id">
+            <div>
+              <strong>#{{ payment.paymentId }}</strong
+              ><span>Subscription #{{ payment.subscriptionId }}</span>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="member-cell">
+            <div>
+              <strong>{{ payment.memberName }}</strong
+              ><span>{{ payment.planName }}</span>
+            </div>
+          </div>
+        </td>
+        <td>
+          <strong class="money">{{ payment.amount | number }} <small>EGP</small></strong>
+        </td>
+        <td>
+          <span class="method-label"
+            ><i class="pi pi-credit-card"></i>{{ paymentMethodLabel(payment.paymentMethod) }}</span
+          >
+        </td>
+        <td><p-tag [value]="payment.status" [severity]="statusSeverity(payment.status)" /></td>
+        <td>
+          <span class="paid-date">{{
+            payment.paidAtUtc ? (payment.paidAtUtc | date: 'MMM d, y · h:mm a') : 'Awaiting payment'
+          }}</span>
+        </td>
+        <td>
+          <div class="row-actions">
+            @if (payment.status === 'Pending') {
+              <p-button
+                icon="pi pi-check"
+                [text]="true"
+                severity="success"
+                ariaLabel="Record payment"
+                pTooltip="Record payment"
+                (onClick)="record.emit(payment)"
+              />
+            }
+            @if (payment.status === 'Paid') {
+              <p-button
+                icon="pi pi-replay"
+                [text]="true"
+                severity="warn"
+                ariaLabel="Refund payment"
+                pTooltip="Refund payment"
+                (onClick)="refund.emit(payment)"
+              />
+            }
+            <p-button
+              icon="pi pi-eye"
+              [text]="true"
+              severity="secondary"
+              ariaLabel="View payment"
+              pTooltip="View details"
+              (onClick)="view.emit(payment)"
+            />
+            @if (payment.status === 'Pending') {
+              <p-button
+                icon="pi pi-times"
+                [text]="true"
+                severity="danger"
+                ariaLabel="Cancel payment"
+                pTooltip="Cancel payment"
+                (onClick)="cancel.emit(payment)"
+              />
+            }
+          </div>
+        </td></tr
+    ></ng-template>
+    <ng-template #emptymessage
+      ><tr>
+        <td colspan="7">
+          <div class="empty-state">
+            <i class="pi pi-wallet"></i><strong>No payments found</strong
+            ><span>Try widening your filters or wait for a payment to be created.</span>
+          </div>
+        </td>
+      </tr></ng-template
+    >
+  </p-table>
+</section>

@@ -1,0 +1,169 @@
+<div class="admin-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">G</div>
+      <span>GYM</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-heading"><span class="nav-section-title">Overview</span><span class="nav-section-line"></span></div>
+
+        <a
+          routerLink="/admin/dashboard"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-item"
+        >
+          <i class="pi pi-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-heading"><span class="nav-section-title">Management</span><span class="nav-section-line"></span></div>
+
+        <a routerLink="/admin/members" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-users"></i>
+          <span>Members</span>
+        </a>
+
+        <a routerLink="/admin/plans" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-list-check"></i>
+          <span>Plans</span>
+        </a>
+
+        <a routerLink="/admin/subscriptions" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-id-card"></i>
+          <span>Subscriptions</span>
+        </a>
+
+        <a routerLink="/admin/attendance" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-calendar-clock"></i>
+          <span>Attendance</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-heading"><span class="nav-section-title">Sales</span><span class="nav-section-line"></span></div>
+
+        <a routerLink="/admin/payments" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-wallet"></i>
+          <span>Payments</span>
+        </a>
+
+        <a routerLink="/admin/offers" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-ticket"></i>
+          <span>Offers &amp; Coupons</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-heading"><span class="nav-section-title">Reports</span><span class="nav-section-line"></span></div>
+
+        <a routerLink="/admin/reports" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-chart-line"></i>
+          <span>Reports</span>
+        </a>
+      </div>
+
+      <div class="nav-section preferences-section">
+        <div class="nav-section-heading"><span class="nav-section-title">Preferences</span><span class="nav-section-line"></span></div>
+        <app-theme-toggle [embedded]="true" />
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a routerLink="/admin/settings" class="nav-item">
+        <i class="pi pi-cog"></i>
+        <span>Settings</span>
+      </a>
+
+      <button
+        type="button"
+        class="logout-item"
+        [disabled]="loggingOut()"
+        (click)="logout()"
+        [attr.aria-label]="loggingOut() ? 'Signing out' : 'Sign out'"
+      >
+        <span class="logout-icon">
+          <i
+            class="pi"
+            [class.pi-sign-out]="!loggingOut()"
+            [class.pi-spin]="loggingOut()"
+            [class.pi-spinner]="loggingOut()"
+          ></i>
+        </span>
+        <span class="logout-copy">
+          <strong>{{ loggingOut() ? 'Signing out…' : 'Sign out' }}</strong>
+          <small>{{ loggingOut() ? 'Ending your session' : 'Securely leave admin' }}</small>
+        </span>
+        <i class="pi pi-arrow-up-right logout-arrow"></i>
+      </button>
+    </div>
+  </aside>
+
+  <nav class="mobile-bottom-nav">
+    <a
+      routerLink="/admin/dashboard"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="mobile-nav-item"
+    >
+      <i class="pi pi-chart-pie"></i>
+      <span>Home</span>
+    </a>
+
+    <a routerLink="/admin/members" routerLinkActive="active" class="mobile-nav-item">
+      <i class="pi pi-users"></i>
+      <span>Members</span>
+    </a>
+
+    <a routerLink="/admin/plans" routerLinkActive="active" class="mobile-nav-item">
+      <i class="pi pi-list-check"></i>
+      <span>Plans</span>
+    </a>
+
+    <a routerLink="/admin/payments" routerLinkActive="active" class="mobile-nav-item">
+      <i class="pi pi-wallet"></i>
+      <span>Payments</span>
+    </a>
+
+    <a routerLink="/admin/offers" routerLinkActive="active" class="mobile-nav-item">
+      <i class="pi pi-ticket"></i>
+      <span>Offers</span>
+    </a>
+
+    <a routerLink="/admin/attendance" routerLinkActive="active" class="mobile-nav-item">
+      <i class="pi pi-calendar-clock"></i>
+      <span>Attendance</span>
+    </a>
+
+    <button type="button" class="mobile-nav-item">
+      <i class="pi pi-ellipsis-h"></i>
+      <span>More</span>
+    </button>
+  </nav>
+
+  <div class="main-area">
+    <p-toast />
+    <div class="admin-topbar">
+      <div class="admin-topbar__identity">
+        <span class="admin-topbar__kicker">OPERATIONS / CONTROL CENTER</span>
+        <strong>Gym management</strong>
+      </div>
+      <div class="admin-topbar__actions">
+        <span class="system-status"><i class="pi pi-circle-fill"></i> Live system</span>
+        <app-notification-center />
+      </div>
+    </div>
+    <main class="page-content">
+      <router-outlet />
+    </main>
+
+    <footer class="app-footer">
+      <span>© 2026 Gym System</span>
+      <span>Built for smarter gym management</span>
+    </footer>
+  </div>
+</div>

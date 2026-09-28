@@ -1,0 +1,98 @@
+@if (loading()) {
+  <section class="page-loading" role="status" aria-live="polite">
+    <span class="page-spinner"></span>
+    <strong>Preparing your dashboard</strong>
+    <small>Loading your membership and latest activity…</small>
+  </section>
+} @else if (hasError()) {
+  <section class="member-empty member-empty--error">
+    <i class="pi pi-cloud-off"></i>
+    <h2>We couldn't load your space</h2>
+    <p>Give it another moment, then try refreshing your dashboard.</p>
+    <p-button label="Try again" icon="pi pi-refresh" (onClick)="loadDashboard()" />
+  </section>
+} @else if (profile(); as member) {
+  <div class="member-page">
+    <section class="welcome-hero">
+      <div class="hero-copy">
+        <span class="eyebrow">YOUR GYM / PERSONAL SPACE</span>
+        <h1>Good morning, {{ member.firstName }} <span aria-hidden="true">👋</span></h1>
+        <p>Everything you need to keep your momentum going is right here.</p>
+        <div class="hero-meta">
+          <span><i class="pi pi-calendar"></i> Member since {{ member.joinDate | date: 'MMM y' }}</span>
+          <span><i class="pi pi-envelope"></i> {{ member.email }}</span>
+        </div>
+      </div>
+      <div class="hero-avatar">
+        @if (imageUrl(member.imageUrl); as image) {
+          <img [src]="image" [alt]="fullName(member.firstName, member.lastName)" />
+        } @else {
+          <span>{{ initials(fullName(member.firstName, member.lastName)) }}</span>
+        }
+      </div>
+    </section>
+
+    @if (pendingPayment(); as pending) {
+      <section class="dashboard-payment-alert">
+        <div class="dashboard-payment-copy"><span class="dashboard-payment-icon"><i class="pi pi-credit-card"></i></span><div><span class="eyebrow">PAYMENT REQUIRED</span><h2>{{ pending.planName }} is waiting for payment.</h2><p>Complete your secure card payment to activate your membership.</p></div></div>
+        <div class="dashboard-payment-action"><strong>{{ pending.amount | number }} <small>EGP</small></strong><p-button label="Complete payment" icon="pi pi-arrow-right" iconPos="right" routerLink="/member/payments" /></div>
+      </section>
+    }
+
+    <section class="membership-card" [class.membership-card--expired]="subscription()?.status === 'Expired'">
+      <div class="membership-topline">
+        <span class="eyebrow">CURRENT MEMBERSHIP</span>
+        @if (subscription(); as current) {
+          <p-tag [value]="current.status" [severity]="statusSeverity(current.status)" />
+        }
+      </div>
+      @if (subscription(); as current) {
+        <div class="membership-main">
+          <div>
+            <h2>{{ current.planName }}</h2>
+            <p>{{ current.startDate | date: 'MMM d, y' }} <span>→</span> {{ current.endDate | date: 'MMM d, y' }}</p>
+          </div>
+          <div class="remaining-days">
+            <strong>{{ daysRemaining() }}</strong>
+            <span>days remaining</span>
+          </div>
+        </div>
+        <div class="membership-progress">
+          <div class="progress-track"><span [style.width.%]="progress()"></span></div>
+          <div><span>Membership progress</span><strong>{{ progress() | number: '1.0-0' }}%</strong></div>
+        </div>
+        <div class="membership-footer">
+          <span><i class="pi pi-sparkles"></i> {{ current.status === 'Active' ? 'Your membership is active' : 'Your membership needs attention' }}</span>
+          <div>
+            <p-button [label]="membershipCta()" icon="pi pi-arrow-right" iconPos="right" [routerLink]="membershipRoute()" />
+            <p-button label="View history" [text]="true" severity="secondary" routerLink="/member/membership/history" />
+          </div>
+        </div>
+      } @else {
+        <div class="no-membership">
+          <div><h2>Your next chapter starts here</h2><p>You don't have an active membership yet. Explore the plans available at your gym.</p></div>
+          <p-button label="Explore membership" icon="pi pi-arrow-right" iconPos="right" routerLink="/member/membership" />
+        </div>
+      }
+    </section>
+
+    <section class="member-stats">
+      <article class="stat-card stat-card--accent"><span class="stat-icon"><i class="pi pi-bolt"></i></span><div><span>Latest visit</span><strong>{{ latestAttendance()?.checkInAtUtc ? (latestAttendance()?.checkInAtUtc | date: 'MMM d, h:mm a') : 'Not yet' }}</strong><small>{{ visitLabel() }}</small></div></article>
+      <article class="stat-card"><span class="stat-icon stat-icon--purple"><i class="pi pi-wallet"></i></span><div><span>Latest payment</span><strong>{{ latestPayment()?.amount ? (latestPayment()?.amount | number) + ' EGP' : 'No payments' }}</strong><small>{{ latestPayment()?.planName || 'Your payment history' }}</small></div></article>
+      <article class="stat-card"><span class="stat-icon stat-icon--orange"><i class="pi pi-shield"></i></span><div><span>Freeze usage</span><strong>{{ subscription()?.freezeCountUsed ?? 0 }} used</strong><small>{{ subscription()?.totalFreezeDaysUsed ?? 0 }} days used</small></div></article>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="activity-card">
+        <div class="section-heading"><div><span class="eyebrow">RECENT MOVEMENT</span><h2>Your latest visits</h2></div><a routerLink="/member/attendance">See all <i class="pi pi-arrow-up-right"></i></a></div>
+        @for (visit of recentAttendance(); track visit.attendanceId) {
+          <div class="activity-row"><span class="activity-icon"><i class="pi pi-sign-in"></i></span><div><strong>Checked in</strong><span>{{ visit.checkInAtUtc | date: 'EEEE, MMM d · h:mm a' }}</span></div><i class="pi pi-check-circle activity-check"></i></div>
+        } @empty {
+          <div class="member-empty member-empty--inline"><i class="pi pi-heart"></i><strong>No visits yet</strong><span>Your first workout is waiting for you.</span></div>
+        }
+      </article>
+      <article class="next-card">
+        <span class="eyebrow">KEEP GOING</span><div class="next-icon"><i class="pi pi-compass"></i></div><h2>Small steps, serious progress.</h2><p>Keep your streak alive by checking in regularly and taking care of your membership.</p><p-button label="Open attendance" icon="pi pi-arrow-right" iconPos="right" [outlined]="true" routerLink="/member/attendance" /></article>
+    </section>
+  </div>
+}

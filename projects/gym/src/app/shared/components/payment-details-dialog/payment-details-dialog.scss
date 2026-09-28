@@ -1,0 +1,94 @@
+.payment-detail {
+  padding: 0.2rem;
+}
+.payment-detail-hero {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding-bottom: 1.2rem;
+}
+.payment-detail-icon {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
+  font-size: 1rem;
+}
+.payment-detail-hero > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.payment-detail-hero h2 {
+  margin: 0.35rem 0 0.15rem;
+  font-size: 1.25rem;
+  letter-spacing: -0.04em;
+}
+.payment-detail-hero span:last-child {
+  color: var(--p-text-muted-color);
+  font-size: 0.7rem;
+}
+.eyebrow {
+  color: var(--p-primary-color);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+.payment-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  padding: 0.9rem;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--p-primary-color) 8%, transparent);
+}
+.payment-detail-grid div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.payment-detail-grid span,
+.member-detail-amount span {
+  color: var(--p-text-muted-color);
+  font-size: 0.62rem;
+}
+.payment-detail-grid strong {
+  overflow: hidden;
+  font-size: 0.74rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.member-detail-amount {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 0;
+}
+.member-detail-amount strong {
+  font-size: 0.95rem;
+}
+.member-detail-amount small {
+  font-size: 0.6rem;
+}
+.detail-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 1.1rem;
+}
+.detail-actions p-button {
+  flex: 1;
+}
+@media (max-width: 520px) {
+  .payment-detail-hero {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .payment-detail-hero p-tag {
+    margin-left: auto;
+  }
+  .detail-actions {
+    flex-direction: column;
+  }
+}

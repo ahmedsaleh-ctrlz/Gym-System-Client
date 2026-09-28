@@ -1,0 +1,13 @@
+<div class="chart-card">
+  <div class="chart-card__header">
+    <div>
+      <span class="chart-card__label">REVENUE</span>
+      <h2>Revenue Overview</h2>
+      <p>Last 7 days</p>
+    </div>
+  </div>
+
+  <div class="chart-wrapper">
+    <p-chart type="line" [data]="chartData()" [options]="chartOptions"/>
+  </div>
+</div>

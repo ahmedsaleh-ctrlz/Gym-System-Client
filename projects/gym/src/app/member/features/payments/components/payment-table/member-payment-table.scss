@@ -1,0 +1,63 @@
+.payments-card {
+  overflow: hidden;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 18px;
+  background: var(--p-content-background);
+  box-shadow: var(--p-card-shadow);
+}
+.card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.35rem;
+}
+.card-heading h2 {
+  margin: 0.35rem 0 0;
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+}
+.eyebrow {
+  color: var(--p-primary-color);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.sub-id {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--p-text-muted-color);
+  font-size: 0.62rem;
+}
+.amount {
+  white-space: nowrap;
+}
+.row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+.pending-row td {
+  background: color-mix(in srgb, var(--p-orange-500) 4%, transparent);
+}
+.empty-payments {
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  padding: 3rem 1rem;
+  color: var(--p-text-muted-color);
+  text-align: center;
+}
+.empty-payments i {
+  color: var(--p-primary-color);
+  font-size: 1.6rem;
+}
+.empty-payments h3 {
+  margin: 0.3rem 0 0;
+  color: var(--p-text-color);
+  font-size: 0.85rem;
+}
+.empty-payments p {
+  margin: 0;
+  font-size: 0.7rem;
+}

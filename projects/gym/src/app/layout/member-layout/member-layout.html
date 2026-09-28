@@ -1,0 +1,138 @@
+<div class="member-shell">
+  <aside class="member-sidebar">
+    <div class="member-brand">
+      <div class="brand-mark">G</div>
+      <div><strong>GYM</strong><span>MEMBER CLUB</span></div>
+    </div>
+
+    <nav class="member-navigation" aria-label="Member navigation">
+      <section class="member-nav-section">
+        <div class="member-nav-section-heading"><span class="member-nav-section-title">Overview</span><span class="member-nav-section-line"></span></div>
+        <a
+          class="member-nav-item"
+          routerLink="/member/dashboard"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <i class="pi pi-home"></i><span>Dashboard</span>
+        </a>
+      </section>
+
+      <section class="member-nav-section">
+        <div class="member-nav-section-heading"><span class="member-nav-section-title">Membership</span><span class="member-nav-section-line"></span></div>
+        <a
+          class="member-nav-item"
+          routerLink="/member/membership"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <i class="pi pi-id-card"></i><span>My membership</span>
+        </a>
+        <a class="member-nav-item" routerLink="/member/plans" routerLinkActive="active">
+          <i class="pi pi-sparkles"></i><span>Plans</span>
+        </a>
+        <a class="member-nav-item" routerLink="/member/membership/history" routerLinkActive="active">
+          <i class="pi pi-history"></i><span>Membership history</span>
+        </a>
+        <a class="member-nav-item" routerLink="/member/attendance" routerLinkActive="active">
+          <i class="pi pi-calendar-clock"></i><span>Attendance</span>
+        </a>
+        <a class="member-nav-item" routerLink="/member/payments" routerLinkActive="active">
+          <i class="pi pi-wallet"></i><span>Payments</span>
+        </a>
+      </section>
+
+      <section class="member-nav-section">
+        <div class="member-nav-section-heading"><span class="member-nav-section-title">Account</span><span class="member-nav-section-line"></span></div>
+        <a class="member-nav-item" routerLink="/member/profile" routerLinkActive="active">
+          <i class="pi pi-user"></i><span>Profile</span>
+        </a>
+        <a class="member-nav-item" routerLink="/member/security" routerLinkActive="active">
+          <i class="pi pi-shield"></i><span>Security</span>
+        </a>
+        <a class="member-nav-item" routerLink="/member/settings" routerLinkActive="active">
+          <i class="pi pi-cog"></i><span>Settings</span>
+        </a>
+      </section>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="preferences">
+        <span class="preferences-title">Preferences</span>
+        <app-theme-toggle [embedded]="true" />
+      </div>
+      <button type="button" class="logout-button" [disabled]="loggingOut()" (click)="logout()">
+        <i
+          class="pi"
+          [class.pi-sign-out]="!loggingOut()"
+          [class.pi-spin]="loggingOut()"
+          [class.pi-spinner]="loggingOut()"
+        ></i>
+        <span>{{ loggingOut() ? 'Signing out…' : 'Sign out' }}</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="member-main">
+    <p-toast />
+    @if (navigationLoading()) {
+      <div class="route-loading" role="status" aria-live="polite">
+        <div class="route-loading-card">
+          <span class="route-spinner"></span>
+          <strong>Loading your space</strong>
+          <small>Getting things ready…</small>
+        </div>
+      </div>
+    }
+
+    <header class="member-header">
+      <div class="header-welcome">
+        <span class="header-kicker">MEMBER PORTAL</span>
+        <strong>Train with intention.</strong>
+      </div>
+      <div class="header-actions">
+        <app-notification-center />
+        @if (profile(); as member) {
+          <a class="header-profile" routerLink="/member/profile">
+            @if (imageUrl(member.imageUrl); as image) {
+              <p-avatar [image]="image" shape="circle" />
+            } @else {
+              <p-avatar
+                [label]="initials(fullName(member.firstName, member.lastName))"
+                shape="circle"
+              />
+            }
+            <span>{{ member.firstName }}</span>
+          </a>
+        }
+        <p-button
+          icon="pi pi-sign-out"
+          [text]="true"
+          severity="secondary"
+          ariaLabel="Sign out"
+          (onClick)="logout()"
+        />
+      </div>
+    </header>
+
+    <main class="member-content"><router-outlet /></main>
+
+    <nav class="mobile-member-nav" aria-label="Member navigation">
+      <a routerLink="/member/dashboard" routerLinkActive="active"
+        ><i class="pi pi-home"></i><span>Home</span></a
+      >
+      <a routerLink="/member/membership" routerLinkActive="active"
+        ><i class="pi pi-id-card"></i><span>Plan</span></a
+      >
+      <a routerLink="/member/attendance" routerLinkActive="active"
+        ><i class="pi pi-calendar-clock"></i><span>Visits</span></a
+      >
+      <a routerLink="/member/payments" routerLinkActive="active"
+        ><i class="pi pi-wallet"></i><span>Payments</span></a
+      >
+      <a routerLink="/member/profile" routerLinkActive="active"
+        ><i class="pi pi-user"></i><span>Profile</span></a
+      >
+    </nav>
+  </div>
+</div>

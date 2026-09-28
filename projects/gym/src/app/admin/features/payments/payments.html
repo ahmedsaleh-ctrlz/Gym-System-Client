@@ -1,0 +1,131 @@
+<p-toast />
+<p-confirmdialog />
+<div class="finance-page payments-page">
+  <header class="finance-header">
+    <div>
+      <span class="eyebrow">REVENUE ENGINE / COLLECTIONS</span>
+      <h1>Payments</h1>
+      <p>Keep every transaction visible, traceable and confidently handled.</p>
+    </div>
+    <div class="header-note">
+      <i class="pi pi-shield"></i
+      ><span>Admin payment desk<br /><small>Stripe checkout is member-facing</small></span>
+    </div>
+  </header>
+  <section class="finance-kpis">
+    <article class="finance-kpi">
+      <div class="kpi-icon"><i class="pi pi-wallet"></i></div>
+      <div>
+        <span>On this page</span><strong>{{ payments().length }}</strong
+        ><small>of {{ total() | number }} transactions</small>
+      </div>
+    </article>
+    <article class="finance-kpi">
+      <div class="kpi-icon kpi-icon--green"><i class="pi pi-check-circle"></i></div>
+      <div>
+        <span>Paid volume</span><strong>{{ paidTotal() | number }} <small>EGP</small></strong
+        ><small>Recorded on this page</small>
+      </div>
+    </article>
+    <article class="finance-kpi">
+      <div class="kpi-icon kpi-icon--orange"><i class="pi pi-clock"></i></div>
+      <div>
+        <span>Pending volume</span><strong>{{ pendingTotal() | number }} <small>EGP</small></strong
+        ><small>Awaiting admin action</small>
+      </div>
+    </article>
+    <article class="finance-kpi finance-kpi--accent">
+      <div>
+        <span>Collection focus</span><strong>{{ pendingCount() }}</strong
+        ><small>Payments ready to resolve</small>
+      </div>
+      <i class="pi pi-bolt"></i>
+    </article>
+  </section>
+  <app-admin-payment-table
+    [payments]="payments()"
+    [total]="total()"
+    [loading]="loading()"
+    [pageNumber]="pageNumber"
+    [pageSize]="pageSize"
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [paymentMethodFilter]="paymentMethodFilter()"
+    [sortDirection]="sortDirection()"
+    [filtersVisible]="filtersVisible()"
+    [paymentMethods]="paymentMethods"
+    (search)="applySearch($event)"
+    (sort)="toggleSort()"
+    (toggleFilters)="filtersVisible.update((value) => !value)"
+    (refresh)="loadPayments()"
+    (filterStatus)="statusFilter.set($event); applyFilters()"
+    (filterMethod)="paymentMethodFilter.set($event); applyFilters()"
+    (clearFilters)="clearFilters()"
+    (page)="loadPayments($event)"
+    (view)="viewDetails($event)"
+    (record)="openPay($event)"
+    (refund)="openRefund($event)"
+    (cancel)="cancelPayment($event)"
+  />
+</div>
+@if (selectedPayment(); as payment) {
+  <app-pay-payment
+    [paymentId]="payment.paymentId"
+    [(visible)]="payVisible"
+    (completed)="onPaymentCompleted()"
+  />
+}
+
+@if (invoicePaymentId(); as paymentId) {
+  <app-invoice-dialog [paymentId]="paymentId" [(visible)]="invoiceVisible" />
+}
+
+<p-dialog
+  [(visible)]="refundVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(470px, calc(100vw - 2rem))' }"
+  header="Refund payment"
+  ><form class="modal-form" [formGroup]="refundForm" (ngSubmit)="refundPayment()">
+    <div class="modal-intro modal-intro--danger">
+      <div class="intro-icon intro-icon--red"><i class="pi pi-replay"></i></div>
+      <div>
+        <strong>Return this payment</strong><span>This will mark the payment as refunded.</span>
+      </div>
+    </div>
+    @if (selectedPayment(); as payment) {
+      <div class="payment-summary">
+        <div>
+          <span>{{ payment.memberName }}</span
+          ><strong>{{ payment.planName }}</strong>
+        </div>
+        <strong class="summary-amount">{{ payment.amount | number }} EGP</strong>
+      </div>
+    }
+    <div class="form-actions">
+      <p-button
+        label="Keep payment"
+        severity="secondary"
+        [text]="true"
+        type="button"
+        (onClick)="refundVisible = false"
+      /><p-button
+        label="Continue to refund"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        severity="danger"
+        type="submit"
+        [loading]="actionLoading() !== null"
+      />
+    </div></form
+></p-dialog>
+
+<app-payment-details-dialog
+  [payment]="selectedPayment()"
+  [(visible)]="detailsVisible"
+  (viewInvoice)="viewSelectedInvoice()"
+  (record)="recordSelectedPayment()"
+  (refund)="refundSelectedPayment()"
+  (cancel)="cancelSelectedPayment()"
+/>

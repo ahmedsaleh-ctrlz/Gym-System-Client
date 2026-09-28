@@ -1,0 +1,75 @@
+<section class="payments-card">
+  <div class="card-heading">
+    <div>
+      <span class="eyebrow">TRANSACTION LOG</span>
+      <h2>Payment history</h2>
+    </div>
+    <ng-content select="[tableActions]" />
+  </div>
+  <p-table [value]="payments()" [loading]="loading()" responsiveLayout="scroll">
+    <ng-template #header
+      ><tr>
+        <th>Date</th>
+        <th>Plan</th>
+        <th>Amount</th>
+        <th>Method</th>
+        <th>Status</th>
+        <th></th></tr
+    ></ng-template>
+    <ng-template #body let-payment
+      ><tr [class.pending-row]="isPayable(payment)">
+        <td>{{ payment.paidAtUtc ? (payment.paidAtUtc | date: 'MMM d, y') : 'Pending' }}</td>
+        <td>
+          <strong>{{ payment.planName }}</strong
+          ><small class="sub-id"
+            >Payment #{{ payment.paymentId }} · Subscription #{{ payment.subscriptionId }}</small
+          >
+        </td>
+        <td>
+          <strong class="amount">{{ payment.amount | number }} EGP</strong>
+        </td>
+        <td>{{ methodLabel(payment.paymentMethod, payment) }}</td>
+        <td><p-tag [value]="payment.status" [severity]="statusSeverity(payment.status)" /></td>
+        <td>
+          <div class="row-actions">
+            @if (isPayable(payment)) {
+              <p-button
+                label="Pay now"
+                icon="pi pi-lock"
+                size="small"
+                [loading]="preparingPaymentId() === payment.paymentId"
+                (onClick)="pay.emit(payment)"
+              />
+            }
+            <p-button
+              icon="pi pi-eye"
+              [text]="true"
+              severity="secondary"
+              ariaLabel="View payment"
+              (onClick)="view.emit(payment)"
+            />
+            @if (canCancel(payment)) {
+              <p-button
+                icon="pi pi-times"
+                [text]="true"
+                severity="danger"
+                ariaLabel="Cancel payment"
+                (onClick)="cancel.emit(payment)"
+              />
+            }
+          </div>
+        </td></tr
+    ></ng-template>
+    <ng-template #emptymessage
+      ><tr>
+        <td colspan="6">
+          <div class="empty-payments">
+            <i class="pi pi-wallet"></i>
+            <h3>No payments yet</h3>
+            <p>Your payment history will appear here.</p>
+          </div>
+        </td>
+      </tr></ng-template
+    >
+  </p-table>
+</section>

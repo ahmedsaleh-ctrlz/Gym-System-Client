@@ -1,0 +1,13 @@
+<div class="stat-card">
+  <span class="title">{{ title() }}</span>
+
+  <div class="value">
+    {{ value() }}
+  </div>
+
+  @if (change()) {
+    <span class="change">
+      {{ change() }}
+    </span>
+  }
+</div>

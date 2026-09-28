@@ -1,0 +1,234 @@
+<p-toast />
+@if (loading()) {
+  <section class="page-loading" role="status" aria-live="polite">
+    <span class="page-spinner"></span>
+    <strong>Preparing your membership</strong>
+    <small>Loading your plan and available options…</small>
+  </section>
+} @else {
+  <div class="member-page">
+    <header class="page-heading">
+      <div>
+        <span class="eyebrow">YOUR MEMBERSHIP</span>
+        <h1>Membership</h1>
+        <p>Know exactly where you stand and what comes next.</p>
+      </div>
+      <p-button
+        [label]="subscription() ? 'Renew membership' : 'Explore plans'"
+        icon="pi pi-sparkles"
+        (onClick)="openRenew()"
+      />
+    </header>
+    @if (subscription(); as current) {
+      <section class="membership-spotlight">
+        <div class="spotlight-top">
+          <span class="eyebrow">CURRENT PLAN</span
+          ><p-tag [value]="current.status" [severity]="statusSeverity(current.status)" />
+        </div>
+        <div class="spotlight-content">
+          <div>
+            <h2>{{ current.planName }}</h2>
+            <p>
+              {{ current.startDate | date: 'MMM d, y' }} → {{ current.endDate | date: 'MMM d, y' }}
+            </p>
+          </div>
+          <div class="big-days">
+            <strong>{{ daysRemaining() }}</strong
+            ><span>days remaining</span>
+          </div>
+        </div>
+        <div class="membership-progress">
+          <div class="progress-track"><span [style.width.%]="progress()"></span></div>
+          <div>
+            <span>{{ progress() | number: '1.0-0' }}% of this membership complete</span
+            ><strong>{{ current.price | number }} EGP</strong>
+          </div>
+        </div>
+        <div class="spotlight-actions">
+          <div>
+            <span><i class="pi pi-snowflake"></i> {{ current.freezeCountUsed }} freezes used</span
+            ><span
+              ><i class="pi pi-calendar"></i> {{ current.totalFreezeDaysUsed }} freeze days
+              used</span
+            >
+          </div>
+          <div>
+            <p-button
+              label="Freeze membership"
+              icon="pi pi-pause"
+              [outlined]="true"
+              [disabled]="!canFreeze()"
+              (onClick)="openFreeze()"
+            /><p-button label="Renew membership" icon="pi pi-refresh" (onClick)="openRenew()" />
+          </div>
+        </div>
+      </section>
+    } @else {
+      <section class="no-membership-panel">
+        <div class="empty-icon"><i class="pi pi-id-card"></i></div>
+        <span class="eyebrow">NO ACTIVE MEMBERSHIP</span>
+        <h2>You don't have an active membership.</h2>
+        <p>Your current plan becomes active after the payment is completed. Choose a plan or open My Payments to continue.</p>
+        <div class="empty-membership-actions">
+          <p-button label="Explore plans" icon="pi pi-arrow-right" iconPos="right" (onClick)="openRenew()" />
+          <p-button label="Open payments" icon="pi pi-wallet" [outlined]="true" routerLink="/member/payments" />
+        </div>
+      </section>
+    }
+    <section class="membership-guidance">
+      <div>
+        <span class="eyebrow">MEMBERSHIP CARE</span>
+        <h2>Built around your rhythm.</h2>
+        <p>
+          Freeze time when life gets busy, renew when you're ready, and keep every part of your
+          journey in one place.
+        </p>
+      </div>
+      <div class="guidance-points">
+        <span><i class="pi pi-check-circle"></i> Flexible freeze options</span
+        ><span><i class="pi pi-check-circle"></i> Clear payment history</span
+        ><span><i class="pi pi-check-circle"></i> Personal attendance</span>
+      </div>
+    </section>
+  </div>
+}
+
+<p-dialog
+  [(visible)]="freezeVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(450px, calc(100vw - 2rem))' }"
+  header="Freeze your membership"
+>
+  <div class="member-dialog">
+    <div class="dialog-intro">
+      <div class="intro-icon"><i class="pi pi-pause"></i></div>
+      <div>
+        <strong>Take a purposeful pause</strong
+        ><span>Your membership will be updated by the gym rules.</span>
+      </div>
+    </div>
+    <label for="freezeDays">Freeze days</label
+    ><input
+      id="freezeDays"
+      type="number"
+      pInputText
+      min="1"
+      max="365"
+      [formControl]="freezeForm.controls.freezeDays"
+    /><small class="field-hint">Enter the number of days you want to freeze.</small>
+    <div class="dialog-actions">
+      <p-button
+        label="Cancel"
+        [text]="true"
+        severity="secondary"
+        (onClick)="freezeVisible = false"
+      /><p-button
+        label="Freeze membership"
+        icon="pi pi-check"
+        [loading]="saving()"
+        (onClick)="freeze()"
+      />
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="renewVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(760px, calc(100vw - 2rem))' }"
+  header="Choose your next plan"
+>
+  @if (renewStep() === 'choose') {
+    <div class="renew-dialog">
+      <div class="dialog-intro">
+        <div class="intro-icon"><i class="pi pi-sparkles"></i></div>
+        <div>
+          <strong>Choose your next plan</strong
+          ><span>Select a plan first. Payment will be completed later from My Payments.</span>
+        </div>
+      </div>
+      <div class="plan-grid">
+        @for (plan of plans(); track plan.planId) {
+          <button
+            type="button"
+            class="plan-option"
+            [class.is-selected]="selectedPlan()?.planId === plan.planId"
+            (click)="choosePlan(plan)"
+          >
+            <span class="plan-option-check"><i class="pi pi-check"></i></span
+            ><strong>{{ plan.title }}</strong
+            ><span class="plan-description">{{ plan.description }}</span>
+            <div>
+              <b>{{ plan.cost | number }} EGP</b><small>{{ plan.durationInDays }} days</small>
+            </div>
+            <footer>
+              <span><i class="pi pi-snowflake"></i> {{ plan.allowedFreezeCount }} freezes</span
+              ><span>{{ plan.maxTotalFreezeDays }} freeze days</span>
+            </footer>
+          </button>
+        } @empty {
+          <div class="empty-plans">No active plans are available right now.</div>
+        }
+      </div>
+      <div class="dialog-actions">
+        <p-button
+          label="Cancel"
+          [text]="true"
+          severity="secondary"
+          (onClick)="renewVisible = false"
+        /><p-button
+          label="Review renewal"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          [disabled]="!selectedPlan()"
+          (onClick)="reviewRenewal()"
+        />
+      </div>
+    </div>
+  } @else if (selectedPlan(); as plan) {
+    <div class="renew-dialog">
+      <div class="dialog-intro">
+        <div class="intro-icon"><i class="pi pi-check"></i></div>
+        <div>
+          <strong>Review your renewal</strong
+          ><span>Your subscription will be created with a pending payment.</span>
+        </div>
+      </div>
+      <div class="renew-review">
+        <div>
+          <span>Selected plan</span><strong>{{ plan.title }}</strong>
+        </div>
+        <div>
+          <span>Price</span><strong>{{ plan.cost | number }} EGP</strong>
+        </div>
+        <div>
+          <span>Duration</span><strong>{{ plan.durationInDays }} days</strong>
+        </div>
+      </div>
+      <div class="renew-note">
+        <i class="pi pi-info-circle"></i
+        ><span
+          >After confirmation, you’ll continue to My Payments to complete the secure Visa/card
+          payment.</span
+        >
+      </div>
+      <div class="dialog-actions">
+        <p-button
+          label="Back"
+          [text]="true"
+          severity="secondary"
+          (onClick)="backToPlanChoice()"
+        /><p-button
+          label="Confirm renewal"
+          icon="pi pi-check"
+          [loading]="saving()"
+          (onClick)="renew()"
+        />
+      </div>
+    </div>
+  }
+</p-dialog>

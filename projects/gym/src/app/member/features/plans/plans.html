@@ -1,0 +1,126 @@
+<p-toast />
+@if (loading()) {
+  <section class="page-loading" role="status" aria-live="polite">
+    <span class="page-spinner"></span>
+    <strong>Finding your next plan</strong>
+    <small>Loading the plans available at your gym…</small>
+  </section>
+} @else {
+  <div class="plans-page">
+    <header class="page-heading">
+      <div>
+        <span class="eyebrow">TRAIN WITH INTENTION</span>
+        <h1>Choose your plan</h1>
+        <p>
+          Pick the rhythm that fits your goals. Your payment will be ready in My Payments after
+          confirmation.
+        </p>
+      </div>
+      <div class="plans-trust">
+        <i class="pi pi-shield"></i
+        ><span>Secure card payment<br /><small>Powered by Stripe</small></span>
+      </div>
+    </header>
+
+    <section class="plans-grid">
+      @for (plan of plans(); track plan.planId) {
+        <article class="plan-card">
+          <div class="plan-card-top">
+            <span class="plan-icon"><i class="pi pi-sparkles"></i></span
+            ><p-tag value="Available" severity="success" />
+          </div>
+          <span class="eyebrow">MEMBERSHIP PLAN</span>
+          <h2>{{ plan.title }}</h2>
+          <p class="plan-description">
+            {{ plan.description || 'A focused membership built to keep your progress moving.' }}
+          </p>
+          <div class="plan-price">
+            <strong>{{ plan.cost | number }}</strong
+            ><span>EGP / {{ plan.durationInDays }} days</span>
+          </div>
+          <div class="plan-facts">
+            <span><i class="pi pi-snowflake"></i>{{ plan.allowedFreezeCount }} freezes</span
+            ><span><i class="pi pi-calendar"></i>{{ plan.maxTotalFreezeDays }} freeze days</span>
+          </div>
+          <p-button
+            label="Choose this plan"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            [fluid]="true"
+            (onClick)="choosePlan(plan)"
+          />
+        </article>
+      } @empty {
+        <section class="empty-plans">
+          <i class="pi pi-inbox"></i>
+          <h2>No plans are available right now.</h2>
+          <p>Check back soon or speak with the gym team.</p>
+        </section>
+      }
+    </section>
+  </div>
+}
+
+<p-dialog
+  [(visible)]="reviewVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(520px, calc(100vw - 2rem))' }"
+  header="Review your plan"
+>
+  @if (selectedPlan(); as plan) {
+    <div class="review-dialog">
+      <div class="review-banner">
+        <span class="plan-icon"><i class="pi pi-check"></i></span>
+        <div>
+          <span class="eyebrow">READY FOR YOUR NEXT CHAPTER</span><strong>{{ plan.title }}</strong
+          ><small>{{
+            canRenewExisting()
+              ? 'Confirm to create your renewal and its pending payment.'
+              : 'Confirm to create your subscription and its pending payment.'
+          }}</small>
+        </div>
+      </div>
+      <div class="review-list">
+        <div>
+          <span>Plan price</span><strong>{{ plan.cost | number }} EGP</strong>
+        </div>
+        <div>
+          <span>Duration</span><strong>{{ plan.durationInDays }} days</strong>
+        </div>
+        <div>
+          <span>Freeze allowance</span
+          ><strong
+            >{{ plan.allowedFreezeCount }} freezes · {{ plan.maxTotalFreezeDays }} days</strong
+          >
+        </div>
+      </div>
+      @if (canRenewExisting()) {
+        <div class="review-note"><i class="pi pi-calendar"></i><span>Your existing {{ currentSubscription()?.status?.toLowerCase() }} membership will determine the renewal start date automatically.</span></div>
+      } @else {
+        <div class="start-date-field"><label for="memberStartDate">Preferred start date</label><input id="memberStartDate" type="date" pInputText [min]="minStartDate" [max]="maxStartDate" [value]="startDate()" (change)="updateStartDate($any($event.target).value)" /><small>Choose today or any date within the next 14 days.</small></div>
+      }
+      <div class="review-note">
+        <i class="pi pi-info-circle"></i
+        ><span
+          >After confirmation, you’ll continue to My Payments to complete the card payment securely
+          through Stripe.</span
+        >
+      </div>
+      <div class="dialog-actions">
+        <p-button
+          label="Keep browsing"
+          [text]="true"
+          severity="secondary"
+          (onClick)="reviewVisible = false"
+        /><p-button
+          [label]="canRenewExisting() ? 'Confirm renewal' : 'Confirm plan'"
+          icon="pi pi-check"
+          [loading]="saving()"
+          (onClick)="createSubscription()"
+        />
+      </div>
+    </div>
+  }
+</p-dialog>

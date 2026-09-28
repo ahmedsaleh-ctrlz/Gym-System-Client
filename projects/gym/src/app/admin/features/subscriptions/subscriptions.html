@@ -1,0 +1,588 @@
+<p-toast />
+<p-confirmdialog />
+<div class="finance-page">
+  <header class="finance-header">
+    <div>
+      <span class="eyebrow">REVENUE ENGINE / MEMBERSHIP</span>
+      <h1>Subscriptions</h1>
+      <p>Turn every membership into a clear, confident next step.</p>
+    </div>
+    <p-button label="New subscription" icon="pi pi-plus" (onClick)="openCreate()" />
+  </header>
+  <section class="finance-kpis">
+    <article class="finance-kpi">
+      <div class="kpi-icon"><i class="pi pi-id-card"></i></div>
+      <div>
+        <span>On this page</span><strong>{{ subscriptions().length }}</strong
+        ><small>of {{ total() | number }} subscriptions</small>
+      </div>
+    </article>
+    <article class="finance-kpi">
+      <div class="kpi-icon kpi-icon--green"><i class="pi pi-check-circle"></i></div>
+      <div>
+        <span>Active now</span><strong>{{ statusCount('Active') }}</strong
+        ><small>Members with access</small>
+      </div>
+    </article>
+    <article class="finance-kpi">
+      <div class="kpi-icon kpi-icon--orange"><i class="pi pi-clock"></i></div>
+      <div>
+        <span>Needs attention</span
+        ><strong>{{ statusCount('Pending') + statusCount('Expired') }}</strong
+        ><small>Pending or expired</small>
+      </div>
+    </article>
+    <article class="finance-kpi finance-kpi--accent">
+      <div>
+        <span>Page value</span><strong>{{ pageRevenue() | number }} <small>EGP</small></strong
+        ><small>Price snapshot total</small>
+      </div>
+      <i class="pi pi-chart-line"></i>
+    </article>
+  </section>
+  <section class="workspace-card">
+    <div class="workspace-toolbar">
+      <div>
+        <span class="eyebrow">THE MEMBERSHIP LEDGER</span>
+        <h2>Subscription portfolio</h2>
+      </div>
+      <div class="toolbar-actions">
+        <div class="search-box">
+          <i class="pi pi-search"></i
+          ><input
+            pInputText
+            #subscriptionSearch
+            type="search"
+            placeholder="Search member or subscription"
+            [value]="searchTerm()"
+            (input)="applySearch(subscriptionSearch.value)"
+          />
+        </div>
+        <p-button
+          [icon]="sortDirection() === 'desc' ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up'"
+          [label]="sortDirection() === 'desc' ? 'Newest first' : 'Oldest first'"
+          [text]="true"
+          severity="secondary"
+          (onClick)="toggleSort()"
+        />
+        <p-button
+          icon="pi pi-sliders-h"
+          label="Filters"
+          [outlined]="filtersVisible()"
+          [text]="!filtersVisible()"
+          severity="secondary"
+          (onClick)="filtersVisible.update((value) => !value)"
+        /><p-button
+          icon="pi pi-refresh"
+          [text]="true"
+          severity="secondary"
+          ariaLabel="Refresh subscriptions"
+          (onClick)="loadSubscriptions()"
+        />
+      </div>
+    </div>
+    @if (filtersVisible()) {
+      <div class="filter-strip">
+        <div class="filter-field">
+          <label>Status</label
+          ><select
+            [value]="statusFilter()"
+            (change)="statusFilter.set($any($event.target).value); applyFilters()"
+          >
+            <option value="">All statuses</option>
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Scheduled">Scheduled</option>
+            <option value="Frozen">Frozen</option>
+            <option value="Expired">Expired</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label>Plan</label
+          ><select
+            [value]="planFilter()"
+            (change)="planFilter.set($any($event.target).value); applyFilters()"
+          >
+            <option value="">All plans</option>
+            @for (plan of plans(); track plan.planId) {
+              <option [value]="plan.title">{{ plan.title }}</option>
+              aa
+            }
+          </select>
+        </div>
+        <div class="filter-field">
+          <label>Start from</label
+          ><input
+            #startFrom
+            type="date"
+            [value]="startDateFrom()"
+            (change)="startDateFrom.set(startFrom.value); applyFilters()"
+          />
+        </div>
+        <div class="filter-field">
+          <label>Start to</label
+          ><input
+            #startTo
+            type="date"
+            [value]="startDateTo()"
+            (change)="startDateTo.set(startTo.value); applyFilters()"
+          />
+        </div>
+        <div class="filter-field">
+          <label>End from</label
+          ><input
+            #endFrom
+            type="date"
+            [value]="endDateFrom()"
+            (change)="endDateFrom.set(endFrom.value); applyFilters()"
+          />
+        </div>
+        <div class="filter-field">
+          <label>End to</label
+          ><input
+            #endTo
+            type="date"
+            [value]="endDateTo()"
+            (change)="endDateTo.set(endTo.value); applyFilters()"
+          />
+        </div>
+        <p-button label="Clear" severity="secondary" [text]="true" (onClick)="clearFilters()" />
+      </div>
+    }
+    <p-table
+      [value]="subscriptions()"
+      [loading]="loading()"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="pageSize"
+      [totalRecords]="total()"
+      [first]="(pageNumber - 1) * pageSize"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
+      (onPage)="loadSubscriptions($event.first / $event.rows + 1)"
+    >
+      <ng-template #header
+        ><tr>
+          <th>Member</th>
+          <th>Plan</th>
+          <th>Value</th>
+          <th>Membership window</th>
+          <th>Status</th>
+          <th>Freeze usage</th>
+          <th class="actions-column">Actions</th>
+        </tr></ng-template
+      >
+      <ng-template #body let-subscription
+        ><tr>
+          <td>
+            <div class="member-cell">
+              <p-avatar [image]="getMemberImageUrl(subscription.memberId)" />
+              <div>
+                <strong>{{ subscription.memberName }}</strong
+                ><span>Member #{{ subscription.memberId }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="plan-cell">
+              <strong>{{ subscription.planName }}</strong
+              ><span>Subscription #{{ subscription.subscriptionId }}</span>
+            </div>
+          </td>
+          <td>
+            <strong class="money">{{ subscription.price | number }} <small>EGP</small></strong>
+          </td>
+          <td>
+            <div class="date-range">
+              <strong>{{ subscription.startDate | date: 'MMM d, y' }}</strong
+              ><i class="pi pi-arrow-right"></i
+              ><strong>{{ subscription.endDate | date: 'MMM d, y' }}</strong>
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="subscription.status" [severity]="statusSeverity(subscription.status)" />
+          </td>
+          <td>
+            <div class="freeze-cell">
+              <strong>{{ subscription.freezeCountUsed }}</strong
+              ><span>/ count</span><small>{{ subscription.totalFreezeDaysUsed }} days used</small>
+            </div>
+          </td>
+          <td>
+            <div class="row-actions">
+              <p-button
+                icon="pi pi-eye"
+                [text]="true"
+                severity="secondary"
+                ariaLabel="View subscription"
+                pTooltip="View details"
+                (onClick)="viewDetails(subscription)"
+              /><p-button
+                icon="pi pi-refresh"
+                [text]="true"
+                severity="secondary"
+                ariaLabel="Renew subscription"
+                pTooltip="Renew"
+                (onClick)="openRenew(subscription)"
+              /><p-button
+                icon="pi pi-ellipsis-v"
+                [text]="true"
+                severity="secondary"
+                ariaLabel="More actions"
+                pTooltip="More actions"
+                (onClick)="viewDetails(subscription)"
+              />
+            </div>
+          </td></tr
+      ></ng-template>
+      <ng-template #emptymessage
+        ><tr>
+          <td colspan="7">
+            <div class="empty-state">
+              <i class="pi pi-id-card"></i><strong>No subscriptions found</strong
+              ><span>Try widening your filters or create a new subscription.</span>
+            </div>
+          </td>
+        </tr></ng-template
+      >
+    </p-table>
+  </section>
+</div>
+
+<p-dialog
+  [(visible)]="createVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(590px, calc(100vw - 2rem))' }"
+  header="Create subscription"
+>
+  <form class="modal-form" [formGroup]="createForm" (ngSubmit)="createSubscription()">
+    <div class="modal-intro">
+      <div class="intro-icon"><i class="pi pi-sparkles"></i></div>
+      <div>
+        <strong>Start a new membership</strong
+        ><span>Connect a member to a plan and set their access date.</span>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field field--full">
+        <label for="createMember">Member</label>
+        <div class="member-picker">
+          <div class="member-search-field" [class.has-selection]="selectedMember()">
+            <i class="pi pi-search" aria-hidden="true"></i>
+            <input
+              #memberInput
+              id="createMember"
+              type="search"
+              autocomplete="off"
+              placeholder="Search by first or last name"
+              [value]="memberSearchTerm()"
+              [attr.aria-expanded]="memberPickerOpen()"
+              aria-controls="member-search-results"
+              (focus)="memberPickerOpen.set(memberSearchResults().length > 0)"
+              (input)="searchMembers(memberInput.value)"
+            />
+            @if (memberSearchLoading()) {
+              <i class="pi pi-spin pi-spinner member-search-status" aria-hidden="true"></i>
+            } @else if (memberSearchTerm()) {
+              <button
+                type="button"
+                class="member-search-clear"
+                aria-label="Clear selected member"
+                (click)="clearMemberSearch()"
+              >
+                <i class="pi pi-times" aria-hidden="true"></i>
+              </button>
+            }
+          </div>
+
+          @if (memberPickerOpen()) {
+            <div id="member-search-results" class="member-results" role="listbox">
+              @if (memberSearchLoading()) {
+                <div class="member-results-state">
+                  <i class="pi pi-spin pi-spinner"></i>
+                  <span>Finding members…</span>
+                </div>
+              } @else if (memberSearchTerm() && !memberSearchResults().length) {
+                <div class="member-results-state">
+                  <i class="pi pi-user-minus"></i>
+                  <span>No matching members found</span>
+                </div>
+              } @else {
+                @for (member of memberSearchResults(); track member.memberId) {
+                  <button
+                    type="button"
+                    class="member-result"
+                    role="option"
+                    (click)="selectMember(member)"
+                  >
+                    <p-avatar [image]="memberImageUrl(member.imageUrl)" />
+                    <span class="member-result-copy">
+                      <strong>{{ fullName(member) }}</strong>
+                      <small>{{ member.email }} · #{{ member.memberId }}</small>
+                    </span>
+                    <i class="pi pi-arrow-up-left member-result-arrow"></i>
+                  </button>
+                }
+              }
+            </div>
+          }
+        </div>
+        @if (createForm.controls.memberId.invalid && createForm.controls.memberId.touched) {
+          <p-message severity="error" [closable]="false">Search and choose a member.</p-message>
+        }
+      </div>
+      <div class="field field--full">
+        <label for="createPlan">Plan</label
+        ><select id="createPlan" formControlName="planId">
+          <option [ngValue]="0">Select a plan</option>
+          @for (plan of plans(); track plan.planId) {
+            <option [ngValue]="plan.planId">
+              {{ plan.title }} · {{ plan.cost | number }} EGP / {{ plan.durationInDays }} days
+            </option>
+          }
+        </select>
+        @if (createForm.controls.planId.invalid && createForm.controls.planId.touched) {
+          <p-message severity="error" [closable]="false">Choose a plan.</p-message>
+        }
+      </div>
+      <div class="field">
+        <label for="createStart">Start date</label
+        ><input id="createStart" type="date" pInputText formControlName="startDate" />
+      </div>
+    </div>
+    @if (selectedPlan(createForm.controls.planId.value); as plan) {
+      <div class="plan-preview">
+        <div>
+          <span>Selected plan</span><strong>{{ plan.title }}</strong>
+        </div>
+        <div>
+          <span>Duration</span><strong>{{ plan.durationInDays }} days</strong>
+        </div>
+        <div>
+          <span>Freeze allowance</span
+          ><strong>{{ plan.allowedFreezeCount }} × {{ plan.maxTotalFreezeDays }} days</strong>
+        </div>
+        <div class="plan-preview__price">
+          <span>Total</span><strong>{{ plan.cost | number }} EGP</strong>
+        </div>
+      </div>
+      @if (projectedEndDate()) {
+        <p class="projected-date">
+          <i class="pi pi-calendar"></i> Projected end date:
+          <strong>{{ projectedEndDate() | date: 'MMM d, y' }}</strong>
+        </p>
+      }
+    }
+    <div class="form-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [text]="true"
+        type="button"
+        (onClick)="createVisible = false"
+      /><p-button label="Create subscription" icon="pi pi-check" type="submit" />
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="renewVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(520px, calc(100vw - 2rem))' }"
+  header="Renew subscription"
+  ><form class="modal-form" [formGroup]="renewForm" (ngSubmit)="renewSubscription()">
+    <div class="modal-intro">
+      <div class="intro-icon intro-icon--green"><i class="pi pi-refresh"></i></div>
+      <div>
+        <strong>Keep the momentum going</strong
+        ><span>Select the plan for the member’s next term.</span>
+      </div>
+    </div>
+    <div class="field">
+      <label for="renewPlan">New plan</label
+      ><select id="renewPlan" formControlName="planId">
+        <option [ngValue]="0">Select a plan</option>
+        @for (plan of plans(); track plan.planId) {
+          <option [ngValue]="plan.planId">{{ plan.title }} · {{ plan.cost | number }} EGP</option>
+        }
+      </select>
+    </div>
+    @if (selectedPlan(renewForm.controls.planId.value); as plan) {
+      <div class="plan-preview plan-preview--compact">
+        <div>
+          <span>New term</span><strong>{{ plan.durationInDays }} days</strong>
+        </div>
+        <div class="plan-preview__price">
+          <span>Price</span><strong>{{ plan.cost | number }} EGP</strong>
+        </div>
+      </div>
+    }
+    <div class="form-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [text]="true"
+        type="button"
+        (onClick)="renewVisible = false"
+      /><p-button label="Review renewal" icon="pi pi-arrow-right" iconPos="right" type="submit" />
+    </div></form
+></p-dialog>
+
+<p-dialog
+  [(visible)]="freezeVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(440px, calc(100vw - 2rem))' }"
+  header="Freeze subscription"
+  ><form class="modal-form" [formGroup]="freezeForm" (ngSubmit)="freezeSubscription()">
+    <div class="modal-intro">
+      <div class="intro-icon intro-icon--orange"><i class="pi pi-pause-circle"></i></div>
+      <div>
+        <strong>Give them room to breathe</strong
+        ><span>Freeze time is added to the subscription end date.</span>
+      </div>
+    </div>
+    <div class="field">
+      <label for="freezeDays">Freeze days</label
+      ><input
+        id="freezeDays"
+        type="number"
+        pInputText
+        min="1"
+        max="365"
+        formControlName="freezeDays"
+      />
+      @if (freezeForm.controls.freezeDays.invalid && freezeForm.controls.freezeDays.touched) {
+        <p-message severity="error" [closable]="false">Enter between 1 and 365 days.</p-message>
+      }
+    </div>
+    @if (selectedSubscription(); as subscription) {
+      <div class="freeze-summary">
+        <span>{{ subscription.memberName }} · {{ subscription.planName }}</span
+        ><strong
+          >{{ subscription.freezeCountUsed }} freezes used ·
+          {{ subscription.totalFreezeDaysUsed }} days used</strong
+        >
+      </div>
+    }
+    <div class="form-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [text]="true"
+        type="button"
+        (onClick)="freezeVisible = false"
+      /><p-button label="Freeze subscription" icon="pi pi-pause" type="submit" />
+    </div></form
+></p-dialog>
+
+<p-dialog
+  [(visible)]="detailsVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(760px, calc(100vw - 2rem))' }"
+  header="Subscription details"
+>
+  @if (selectedSubscription(); as subscription) {
+    <div class="detail-modal">
+      <div class="detail-hero">
+        <div class="detail-avatar">{{ subscription.memberName.charAt(0) }}</div>
+        <div>
+          <span class="eyebrow">SUBSCRIPTION #{{ subscription.subscriptionId }}</span>
+          <h2>{{ subscription.memberName }}</h2>
+          <span>{{ subscription.planName }} · Member #{{ subscription.memberId }}</span>
+        </div>
+        <p-tag [value]="subscription.status" [severity]="statusSeverity(subscription.status)" />
+      </div>
+      <div class="detail-grid">
+        <div>
+          <span>Price snapshot</span><strong>{{ subscription.price | number }} EGP</strong>
+        </div>
+        <div>
+          <span>Start date</span><strong>{{ subscription.startDate | date: 'MMM d, y' }}</strong>
+        </div>
+        <div>
+          <span>End date</span><strong>{{ subscription.endDate | date: 'MMM d, y' }}</strong>
+        </div>
+        <div>
+          <span>Freeze usage</span
+          ><strong
+            >{{ subscription.freezeCountUsed }} times /
+            {{ subscription.totalFreezeDaysUsed }} days</strong
+          >
+        </div>
+      </div>
+      <div class="detail-actions">
+        @if (canActivate(subscription.status)) {
+          <p-button
+            label="Activate"
+            icon="pi pi-check"
+            severity="success"
+            [outlined]="true"
+            (onClick)="confirmAction(subscription, 'activate')"
+          />
+        }
+        @if (canSchedule(subscription.status)) {
+          <p-button
+            label="Schedule"
+            icon="pi pi-calendar-plus"
+            severity="info"
+            [outlined]="true"
+            (onClick)="confirmAction(subscription, 'schedule')"
+          />
+        }
+        @if (canFreeze(subscription.status)) {
+          <p-button
+            label="Freeze"
+            icon="pi pi-pause"
+            severity="warn"
+            [outlined]="true"
+            (onClick)="openFreeze(subscription)"
+          />
+        }
+        @if (canCancel(subscription.status)) {
+          <p-button
+            label="Cancel"
+            icon="pi pi-times"
+            severity="danger"
+            [outlined]="true"
+            (onClick)="confirmAction(subscription, 'cancel')"
+          />
+        }
+        <p-button
+          label="Renew"
+          icon="pi pi-refresh"
+          [outlined]="true"
+          (onClick)="detailsVisible = false; openRenew(subscription)"
+        />
+      </div>
+      <div class="history-heading">
+        <span class="eyebrow">MEMBER HISTORY</span>
+        <h3>Previous subscriptions</h3>
+      </div>
+      @for (item of selectedHistory(); track item.subscriptionId) {
+        <div class="history-row">
+          <div>
+            <strong>{{ item.planName }}</strong
+            ><span
+              >{{ item.startDate | date: 'MMM d, y' }} → {{ item.endDate | date: 'MMM d, y' }}</span
+            >
+          </div>
+          <p-tag [value]="item.status" [severity]="statusSeverity(item.status)" /><strong
+            >{{ item.price | number }} EGP</strong
+          >
+        </div>
+      }
+      @if (!selectedHistory().length) {
+        <div class="muted-state">No previous subscription records found.</div>
+      }
+    </div>
+  }
+</p-dialog>

@@ -1,0 +1,89 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{
+    width: memberMode() ? 'min(500px, calc(100vw - 2rem))' : 'min(560px, calc(100vw - 2rem))',
+  }"
+  header="Payment details"
+>
+  @if (payment(); as payment) {
+    <div class="payment-detail">
+      <div class="payment-detail-hero">
+        <div class="payment-detail-icon"><i class="pi pi-receipt"></i></div>
+        <div>
+          <span class="eyebrow">PAYMENT #{{ payment.paymentId }}</span>
+          <h2>{{ memberMode() ? payment.planName : (payment.amount | number) + ' EGP' }}</h2>
+          <span>{{
+            memberMode() ? payment.status : payment.memberName + ' · ' + payment.planName
+          }}</span>
+        </div>
+        <p-tag [value]="payment.status" [severity]="statusSeverity(payment.status)" />
+      </div>
+      @if (memberMode()) {
+        <div class="member-detail-amount">
+          <span>Amount</span><strong>{{ payment.amount | number }} <small>EGP</small></strong>
+        </div>
+      }
+      <div class="payment-detail-grid">
+        <div>
+          <span>Member</span><strong>{{ payment.memberName }}</strong>
+        </div>
+        <div>
+          <span>Subscription</span><strong>#{{ payment.subscriptionId }}</strong>
+        </div>
+        <div>
+          <span>Payment method</span
+          ><strong>{{ paymentMethodLabel(payment.paymentMethod, payment) }}</strong>
+        </div>
+        @if (!memberMode() && hasPaymentReference(payment)) {
+          <div>
+            <span>Payment reference</span
+            ><strong>{{ payment.paymentReference || 'Not provided' }}</strong>
+          </div>
+        }
+        <div>
+          <span>Paid at</span
+          ><strong>{{
+            payment.paidAtUtc ? (payment.paidAtUtc | date: 'MMM d, y · h:mm a') : 'Pending'
+          }}</strong>
+        </div>
+      </div>
+      @if (isCompleted(payment)) {
+        <div class="detail-actions">
+          <p-button
+            label="View invoice"
+            icon="pi pi-file-pdf"
+            [outlined]="true"
+            (onClick)="viewInvoice.emit(); visible.set(false)"
+          />
+          @if (!memberMode()) {
+            <p-button
+              label="Refund payment"
+              icon="pi pi-replay"
+              severity="warn"
+              (onClick)="refund.emit(); visible.set(false)"
+            />
+          }
+        </div>
+      }
+      @if (!memberMode() && isPending(payment)) {
+        <div class="detail-actions">
+          <p-button
+            label="Record payment"
+            icon="pi pi-check"
+            severity="success"
+            (onClick)="record.emit(); visible.set(false)"
+          /><p-button
+            label="Cancel payment"
+            icon="pi pi-times"
+            severity="danger"
+            [outlined]="true"
+            (onClick)="cancel.emit(); visible.set(false)"
+          />
+        </div>
+      }
+    </div>
+  }
+</p-dialog>

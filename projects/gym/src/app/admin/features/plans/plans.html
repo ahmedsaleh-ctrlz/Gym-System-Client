@@ -1,0 +1,320 @@
+<p-toast />
+<p-confirmdialog />
+<div class="plans-page">
+  <header class="plans-header">
+    <div>
+      <span class="eyebrow">REVENUE ENGINE / CATALOG</span>
+      <h1>Plans</h1>
+      <p>Shape flexible memberships your community can commit to.</p>
+    </div>
+    <p-button label="New plan" icon="pi pi-plus" (onClick)="openCreate()" />
+  </header>
+  <section class="catalog-banner">
+    <div class="banner-icon"><i class="pi pi-star"></i></div>
+    <div>
+      <span class="eyebrow">THE MEMBERSHIP CATALOG</span>
+      <h2>Simple plans. Clear value.</h2>
+      <p>Keep pricing and freeze policies transparent for your team and your members.</p>
+    </div>
+    <div class="banner-meta">
+      <strong>{{ total() }}</strong
+      ><span>plans in catalog</span>
+    </div>
+  </section>
+  <section class="workspace-card">
+    <div class="workspace-toolbar">
+      <div>
+        <span class="eyebrow">PLAN CONFIGURATION</span>
+        <h2>Plan catalog</h2>
+      </div>
+      <div class="toolbar-actions">
+        <div class="search-box">
+          <i class="pi pi-search"></i
+          ><input
+            pInputText
+            #planSearch
+            type="search"
+            placeholder="Search plans"
+            [value]="searchTerm()"
+            (input)="applySearch(planSearch.value)"
+          />
+        </div>
+        <p-button
+          [icon]="sortDirection() === 'asc' ? 'pi pi-sort-alpha-down' : 'pi pi-sort-alpha-up'"
+          [label]="sortDirection() === 'asc' ? 'A → Z' : 'Z → A'"
+          [text]="true"
+          severity="secondary"
+          (onClick)="toggleSort()"
+        /><p-button
+          icon="pi pi-refresh"
+          [text]="true"
+          severity="secondary"
+          ariaLabel="Refresh plans"
+          (onClick)="loadPlans()"
+        />
+      </div>
+    </div>
+    <p-table
+      [value]="plans()"
+      [loading]="loading()"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="pageSize"
+      [totalRecords]="total()"
+      [first]="(pageNumber - 1) * pageSize"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
+      (onPage)="loadPlans($event.first / $event.rows + 1)"
+      ><ng-template #header
+        ><tr>
+          <th>Plan</th>
+          <th>Price</th>
+          <th>Duration</th>
+          <th>Status</th>
+          <th>Freeze policy</th>
+          <th class="actions-column">Actions</th>
+        </tr></ng-template
+      ><ng-template #body let-plan
+        ><tr>
+          <td>
+            <div class="plan-cell">
+              <i class="pi pi-bolt"></i>
+              <div>
+                <strong>{{ plan.title }}</strong
+                ><span>{{ plan.description }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <strong class="price">{{ plan.cost | number }} <small>EGP</small></strong>
+          </td>
+          <td>
+            <span class="duration"
+              ><i class="pi pi-calendar"></i>{{ plan.durationInDays }} days</span
+            >
+          </td>
+          <td>
+            <p-tag
+              [value]="plan.isActive ? 'Active' : 'Inactive'"
+              [severity]="statusSeverity(plan.isActive)"
+            />
+          </td>
+          <td>
+            <div class="freeze-policy">
+              <strong>{{ plan.allowedFreezeCount }} <small>uses</small></strong
+              ><span>up to {{ plan.maxTotalFreezeDays }} days</span>
+            </div>
+          </td>
+          <td>
+            <div class="row-actions">
+              <p-button
+                icon="pi pi-eye"
+                [text]="true"
+                severity="secondary"
+                ariaLabel="View plan"
+                pTooltip="View details"
+                (onClick)="viewDetails(plan)"
+              /><p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                severity="secondary"
+                ariaLabel="Edit plan"
+                pTooltip="Edit plan"
+                (onClick)="openEdit(plan)"
+              />
+              @if (plan.isActive) {
+                <p-button
+                  icon="pi pi-ban"
+                  [text]="true"
+                  severity="danger"
+                  ariaLabel="Deactivate plan"
+                  pTooltip="Deactivate plan"
+                  (onClick)="deactivate(plan)"
+                />
+              }
+            </div>
+          </td></tr></ng-template
+      ><ng-template #emptymessage
+        ><tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <i class="pi pi-box"></i><strong>No plans found</strong
+              ><span>Try a different search or create your first membership plan.</span>
+            </div>
+          </td>
+        </tr></ng-template
+      ></p-table
+    >
+  </section>
+</div>
+
+<p-dialog
+  [(visible)]="planDialogVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(600px, calc(100vw - 2rem))' }"
+  [header]="editingId === null ? 'Create plan' : 'Edit plan'"
+  ><form class="plan-form" [formGroup]="planForm" (ngSubmit)="savePlan()">
+    <div class="form-intro">
+      <div class="intro-icon"><i class="pi pi-sliders-h"></i></div>
+      <div>
+        <strong>{{
+          editingId === null ? 'Build a plan people understand' : 'Refine this plan'
+        }}</strong
+        ><span>Clear rules make confident membership decisions.</span>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field field--full">
+        <label for="planTitle">Plan title</label
+        ><input id="planTitle" pInputText formControlName="title" placeholder="Premium" />
+        @if (isInvalid('title')) {
+          <p-message severity="error" [closable]="false">{{ error('title') }}</p-message>
+        }
+      </div>
+      <div class="field field--full">
+        <label for="planDescription">Description</label
+        ><textarea
+          id="planDescription"
+          pInputText
+          formControlName="description"
+          rows="3"
+          placeholder="Full access for members who want more..."
+        ></textarea>
+        @if (isInvalid('description')) {
+          <p-message severity="error" [closable]="false">{{ error('description') }}</p-message>
+        }
+      </div>
+      <div class="field">
+        <label for="planCost">Price <span>EGP</span></label
+        ><input
+          id="planCost"
+          type="number"
+          min="0.01"
+          step="0.01"
+          pInputText
+          formControlName="cost"
+        />
+        @if (isInvalid('cost')) {
+          <p-message severity="error" [closable]="false">{{ error('cost') }}</p-message>
+        }
+      </div>
+      <div class="field">
+        <label for="planDuration">Duration <span>days</span></label
+        ><input
+          id="planDuration"
+          type="number"
+          min="1"
+          step="1"
+          pInputText
+          formControlName="durationInDays"
+        />
+        @if (isInvalid('durationInDays')) {
+          <p-message severity="error" [closable]="false">{{ error('durationInDays') }}</p-message>
+        }
+      </div>
+      <div class="field">
+        <label for="freezeCount">Allowed freezes <span>times</span></label
+        ><input
+          id="freezeCount"
+          type="number"
+          min="0"
+          step="1"
+          pInputText
+          formControlName="allowedFreezeCount"
+        />
+        @if (isInvalid('allowedFreezeCount')) {
+          <p-message severity="error" [closable]="false">{{
+            error('allowedFreezeCount')
+          }}</p-message>
+        }
+      </div>
+      <div class="field">
+        <label for="maxFreezeDays">Maximum freeze <span>days total</span></label
+        ><input
+          id="maxFreezeDays"
+          type="number"
+          min="0"
+          step="1"
+          pInputText
+          formControlName="maxTotalFreezeDays"
+        />
+        @if (isInvalid('maxTotalFreezeDays')) {
+          <p-message severity="error" [closable]="false">{{
+            error('maxTotalFreezeDays')
+          }}</p-message>
+        }
+      </div>
+    </div>
+    <div class="form-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [text]="true"
+        type="button"
+        (onClick)="planDialogVisible = false"
+      /><p-button
+        [label]="editingId === null ? 'Create plan' : 'Save changes'"
+        icon="pi pi-check"
+        type="submit"
+        [loading]="saving()"
+      />
+    </div></form
+></p-dialog>
+
+<p-dialog
+  [(visible)]="detailsVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(540px, calc(100vw - 2rem))' }"
+  header="Plan details"
+>
+  @if (selectedPlan(); as plan) {
+    <div class="plan-details">
+      <div class="detail-hero">
+        <div class="detail-plan-icon"><i class="pi pi-bolt"></i></div>
+        <div>
+          <span class="eyebrow">PLAN #{{ plan.planId }}</span>
+          <h2>{{ plan.title }}</h2>
+          <span>{{ plan.description }}</span>
+        </div>
+        <p-tag
+          [value]="plan.isActive ? 'Active' : 'Inactive'"
+          [severity]="statusSeverity(plan.isActive)"
+        />
+      </div>
+      <div class="detail-stats">
+        <div>
+          <span>Price</span><strong>{{ plan.cost | number }} EGP</strong>
+        </div>
+        <div>
+          <span>Duration</span><strong>{{ plan.durationInDays }} days</strong>
+        </div>
+        <div>
+          <span>Allowed freezes</span><strong>{{ plan.allowedFreezeCount }}</strong>
+        </div>
+        <div>
+          <span>Maximum frozen</span><strong>{{ plan.maxTotalFreezeDays }} days</strong>
+        </div>
+      </div>
+      <div class="detail-actions">
+        <p-button
+          label="Edit plan"
+          icon="pi pi-pencil"
+          (onClick)="detailsVisible = false; openEdit(plan)"
+        />
+        @if (plan.isActive) {
+          <p-button
+            label="Deactivate"
+            icon="pi pi-ban"
+            severity="danger"
+            [outlined]="true"
+            (onClick)="detailsVisible = false; deactivate(plan)"
+          />
+        }
+      </div>
+    </div>
+  }
+</p-dialog>

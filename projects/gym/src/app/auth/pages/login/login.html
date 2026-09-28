@@ -1,0 +1,180 @@
+<main class="login-page">
+  <section class="login-brand">
+    <div class="brand-content">
+      <div class="brand-logo">G</div>
+
+      <span class="eyebrow">GYM MANAGEMENT</span>
+
+      <h1>
+        Train smarter.<br />
+        Manage better.
+      </h1>
+
+      <p>
+        Everything you need to manage your gym, members, subscriptions and performance in one place.
+      </p>
+
+      <div class="brand-footer">
+        <span class="status-dot"></span>
+        <span>Powering smarter fitness management</span>
+      </div>
+    </div>
+  </section>
+  <p-toast [baseZIndex]="99999"></p-toast>
+  <section class="login-section">
+    <div class="login-container">
+      <div class="mobile-logo">
+        <div class="brand-logo">G</div>
+        <span>GYM</span>
+      </div>
+
+      <div class="login-header">
+        <span class="eyebrow">WELCOME BACK</span>
+
+        <h2>Sign in to your account</h2>
+
+        <p>Enter your credentials to access your dashboard.</p>
+      </div>
+
+      <form class="login-form" [formGroup]="LoginForm" (ngSubmit)="submitForm()">
+        <div class="field">
+          <label for="email">Email address</label>
+
+          <input
+            id="email"
+            type="email"
+            pInputText
+            placeholder="you@example.com"
+            autocomplete="email"
+            class="px-2"
+            formControlName="email"
+          />
+
+          @if (isInvalid('email')) {
+            <div>
+              <p-message severity="error" [closable]="false" class="">{{
+                getErrorMessage('email')
+              }}</p-message>
+            </div>
+          }
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="password">Password</label>
+
+            <button type="button" class="forgot-link" (click)="openForgotPassword()">Forgot password?</button>
+          </div>
+
+          <div class="flex justify-center field">
+            <p-iconfield>
+              <input
+                pInputPassword
+                name="password"
+                [(mask)]="mask"
+                class="px-2"
+                formControlName="password"
+              />
+              <p-inputicon (click)="mask = !mask" style="cursor: pointer">
+                @if (mask) {
+                  <svg data-p-icon="eye"></svg>
+                } @else {
+                  <svg data-p-icon="eye-slash"></svg>
+                }
+              </p-inputicon>
+            </p-iconfield>
+            @if (isInvalid('password')) {
+              <p-message severity="error" [closable]="false">{{
+                getErrorMessage('password')
+              }}</p-message>
+            }
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" />
+            <span>Remember me</span>
+          </label>
+        </div>
+
+        <p-button label="Sign in" type="submit" styleClass="login-button" fluid="true" />
+      </form>
+
+      <p-dialog
+        [(visible)]="showForgotPasswordDialog"
+        [modal]="true"
+        [draggable]="false"
+        [resizable]="false"
+        [style]="{ width: 'min(440px, calc(100vw - 2rem))' }"
+        header="Reset your password"
+      >
+        <form class="forgot-password-dialog" (ngSubmit)="submitForgotPassword()">
+          <div class="forgot-password-icon"><i class="pi pi-key"></i></div>
+          <h2>Let’s get you back in</h2>
+          <p>Enter the email connected to your account and we’ll send you a secure reset link.</p>
+          <div class="field">
+            <label for="forgotEmail">Email address</label>
+            <input id="forgotEmail" type="email" pInputText [formControl]="forgotEmail" placeholder="you@example.com" autocomplete="email" />
+            @if (forgotEmail.invalid && (forgotEmail.dirty || forgotEmail.touched)) {
+              <p-message severity="error" [closable]="false">Enter a valid email address.</p-message>
+            }
+          </div>
+          <p-button label="Email me a reset link" icon="pi pi-send" type="submit" [loading]="forgotPasswordLoading()" fluid="true" />
+          <p-button label="Back to sign in" severity="secondary" [text]="true" type="button" (onClick)="showForgotPasswordDialog.set(false)" fluid="true" />
+        </form>
+      </p-dialog>
+
+      <p-dialog
+        [(visible)]="showEmailConfirmationDialog"
+        [modal]="true"
+        [draggable]="false"
+        [resizable]="false"
+        [closable]="false"
+        [style]="{ width: 'min(440px, calc(100vw - 2rem))' }"
+      >
+        <div class="confirmation-dialog">
+          <div class="confirmation-icon">
+            <i class="pi pi-envelope"></i>
+          </div>
+
+          <div class="confirmation-content">
+            <h2>Email not confirmed</h2>
+
+            <p>
+              Your email address hasn't been confirmed yet. Please check your inbox or request a new
+              confirmation email.
+            </p>
+
+            <div class="confirmation-actions">
+              <p-button
+                [label]="
+                  resendCooldown() > 0
+                    ? 'Resend available in ' + resendCooldown() + 's'
+                    : 'Resend confirmation email'
+                "
+                icon="pi pi-send"
+                [fluid]="true"
+                [disabled]="resendCooldown() > 0"
+                (onClick)="resendConfirmationEmail()"
+              />
+
+              <p-button
+                label="Cancel"
+                severity="secondary"
+                [text]="true"
+                [fluid]="true"
+                (onClick)="showEmailConfirmationDialog.set(false)"
+              />
+            </div>
+          </div>
+        </div>
+      </p-dialog>
+
+      <div class="login-footer">
+        <span>© 2026 Gym System</span>
+        <span>New here? <a routerLink="/register">Create an account</a></span>
+      </div>
+    </div>
+  </section>
+</main>

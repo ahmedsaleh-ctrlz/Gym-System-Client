@@ -1,0 +1,51 @@
+.success-state {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 0.5rem 0;
+}
+.success-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  color: var(--p-green-500);
+  background: color-mix(in srgb, var(--p-green-500) 13%, transparent);
+  font-size: 1.4rem;
+}
+.eyebrow {
+  margin-top: 1rem;
+  color: var(--p-primary-color);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.success-state h2 {
+  margin: 0.55rem 0 0.25rem;
+  font-size: 1.25rem;
+}
+.success-state p {
+  margin: 0.3rem;
+  color: var(--p-text-color);
+  font-size: 0.78rem;
+}
+.success-state > small {
+  color: var(--p-text-muted-color);
+  font-size: 0.67rem;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid var(--p-content-border-color);
+}
+@media (max-width: 560px) {
+  .dialog-actions p-button {
+    flex: 1;
+  }
+}

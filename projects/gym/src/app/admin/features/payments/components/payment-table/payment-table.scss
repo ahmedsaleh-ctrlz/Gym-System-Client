@@ -1,0 +1,166 @@
+.workspace-card {
+  overflow: hidden;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 16px;
+  background: var(--p-content-background);
+  box-shadow: var(--p-card-shadow);
+}
+.workspace-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.35rem;
+}
+.workspace-toolbar h2 {
+  margin: 0.4rem 0 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+.eyebrow {
+  color: var(--p-primary-color);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: min(290px, 30vw);
+  padding: 0 0.75rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 9px;
+  color: var(--p-text-muted-color);
+}
+.search-box input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+}
+.filter-strip {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 1.35rem;
+  border-top: 1px solid var(--p-content-border-color);
+  border-bottom: 1px solid var(--p-content-border-color);
+  background: var(--p-surface-50);
+}
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 125px;
+}
+.filter-field label {
+  color: var(--p-text-muted-color);
+  font-size: 0.63rem;
+  font-weight: 700;
+}
+.filter-field select {
+  min-height: 38px;
+  padding: 0 0.65rem;
+  border: 1px solid var(--p-form-field-border-color);
+  border-radius: 8px;
+  background: var(--p-form-field-background);
+  color: var(--p-form-field-color);
+  font: inherit;
+  font-size: 0.72rem;
+}
+.payment-id,
+.member-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.payment-id strong,
+.payment-id span,
+.member-cell strong,
+.member-cell span {
+  display: block;
+}
+.payment-id strong,
+.member-cell strong {
+  font-size: 0.77rem;
+}
+.payment-id span,
+.member-cell span {
+  margin-top: 0.2rem;
+  color: var(--p-text-muted-color);
+  font-size: 0.65rem;
+}
+.money {
+  white-space: nowrap;
+  font-size: 0.78rem;
+}
+.money small {
+  color: var(--p-text-muted-color);
+  font-size: 0.6rem;
+  font-weight: 500;
+}
+.method-label,
+.paid-date {
+  color: var(--p-text-muted-color);
+  font-size: 0.68rem;
+}
+.method-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.method-label i {
+  color: var(--p-primary-color);
+}
+.paid-date {
+  white-space: nowrap;
+}
+.actions-column {
+  text-align: right;
+}
+.row-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.empty-state {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 3.5rem 1rem;
+  color: var(--p-text-muted-color);
+}
+.empty-state i {
+  margin-bottom: 0.35rem;
+  color: var(--p-primary-color);
+  font-size: 1.7rem;
+}
+.empty-state strong {
+  color: var(--p-text-color);
+  font-size: 0.85rem;
+}
+@media (max-width: 800px) {
+  .workspace-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .toolbar-actions {
+    flex-wrap: wrap;
+  }
+  .search-box {
+    width: 100%;
+  }
+  .filter-strip {
+    align-items: stretch;
+  }
+  .filter-field {
+    flex: 1 1 150px;
+  }
+}

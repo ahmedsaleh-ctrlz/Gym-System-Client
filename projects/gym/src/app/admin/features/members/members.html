@@ -1,0 +1,370 @@
+<p-toast />
+<p-confirmdialog />
+<div class="members-page">
+  <header class="members-header">
+    <div>
+      <span class="eyebrow">PEOPLE / DIRECTORY</span>
+      <h1>Members</h1>
+      <p>Keep your community moving, connected and coming back.</p>
+    </div>
+    <p-button label="Add member" icon="pi pi-plus" (onClick)="openCreate()" />
+  </header>
+  <section class="pulse-grid" aria-label="Member overview">
+    <article class="pulse-card">
+      <div class="pulse-icon"><i class="pi pi-users"></i></div>
+      <div>
+        <span>Total members</span><strong>{{ totalMembers() | number }}</strong>
+      </div>
+      <i class="pi pi-arrow-up-right pulse-arrow"></i>
+    </article>
+    <article class="pulse-card">
+      <div class="pulse-icon pulse-icon--green"><i class="pi pi-bolt"></i></div>
+      <div>
+        <span>Active members</span><strong>{{ activeCount() | number }}</strong>
+      </div>
+      <small>Live from subscriptions</small>
+    </article>
+    <article class="pulse-card">
+      <div class="pulse-icon pulse-icon--orange"><i class="pi pi-calendar-plus"></i></div>
+      <div>
+        <span>On this page</span><strong>{{ members().length | number }}</strong>
+      </div>
+      <small>Showing {{ pageSize }} per view</small>
+    </article>
+    <article class="pulse-card pulse-card--accent">
+      <div>
+        <span>Member experience</span><strong> Make it count.</strong
+        ><small>Every visit is a chance to build momentum.</small>
+      </div>
+      <i class="pi pi-sparkles"></i>
+    </article>
+  </section>
+  <section class="directory-card">
+    <div class="directory-toolbar">
+      <div>
+        <span class="eyebrow">THE CREW</span>
+        <h2>Member directory</h2>
+      </div>
+      <div class="toolbar-actions">
+        <div class="search-box">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="search"
+            placeholder="Search by name, email or phone"
+            [formControl]="searchControl"
+          />
+        </div>
+        <p-button
+          icon="pi pi-refresh"
+          [text]="true"
+          severity="secondary"
+          ariaLabel="Refresh members"
+          (onClick)="loadMembers()"
+        />
+      </div>
+    </div>
+    <p-table
+      [value]="members()"
+      [loading]="loading()"
+      [paginator]="true"
+      [rows]="pageSize"
+      [totalRecords]="totalMembers()"
+      [first]="(pageNumber - 1) * pageSize"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords} members"
+      (onPage)="loadMembers($event.first / $event.rows + 1)"
+    >
+      <ng-template #header
+        ><tr>
+          <th>Member</th>
+          <th>Contact</th>
+          <th>Joined</th>
+          <th>Member ID</th>
+          <th class="actions-column">Actions</th>
+        </tr></ng-template
+      >
+      <ng-template #body let-member
+        ><tr>
+          <td>
+            <div class="member-cell">
+              <p-avatar [image]="imageUrl(member.imageUrl)" shape="circle" />
+              <div>
+                <strong>{{ fullName(member) }}</strong
+                ><span>{{ member.email }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="phone"
+              ><i class="pi pi-phone"></i>{{ member.phoneNumber || 'No phone added' }}</span
+            >
+          </td>
+          <td>
+            <span class="date-label">{{ member.joinDate | date: 'MMM d, y' }}</span>
+          </td>
+          <td>
+            <span class="member-id">#{{ member.memberId.toString().padStart(4, '0') }}</span>
+          </td>
+          <td>
+            <div class="row-actions">
+              <p-button
+                icon="pi pi-sign-in"
+                [text]="true"
+                severity="success"
+                ariaLabel="Check in member"
+                pTooltip="Check in"
+                (onClick)="checkIn(member)"
+              /><p-button
+                icon="pi pi-eye"
+                [text]="true"
+                severity="secondary"
+                ariaLabel="View member"
+                pTooltip="View profile"
+                (onClick)="viewDetails(member)"
+              /><p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                severity="secondary"
+                ariaLabel="Edit member"
+                pTooltip="Edit"
+                (onClick)="openEdit(member)"
+              /><p-button
+                icon="pi pi-trash"
+                [text]="true"
+                severity="danger"
+                ariaLabel="Remove member"
+                pTooltip="Remove"
+                (onClick)="remove(member)"
+              />
+            </div>
+          </td></tr
+      ></ng-template>
+      <ng-template #emptymessage
+        ><tr>
+          <td colspan="5">
+            <div class="empty-state">
+              <i class="pi pi-users"></i><strong>No members found</strong
+              ><span>Try a different search or add your first member.</span>
+            </div>
+          </td>
+        </tr></ng-template
+      >
+    </p-table>
+  </section>
+</div>
+<p-dialog
+  [(visible)]="memberDialogVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(620px, calc(100vw - 2rem))' }"
+  [header]="editingId === null ? 'Add a new member' : 'Edit member profile'"
+>
+  <form class="member-form" [formGroup]="memberForm" (ngSubmit)="saveMember()">
+    <div class="form-intro">
+      <div class="form-symbol"><i class="pi pi-user-plus"></i></div>
+      <div>
+        <strong>{{
+          editingId === null ? 'Welcome someone new' : 'Keep their profile fresh'
+        }}</strong
+        ><span>Small details make the gym feel personal.</span>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label for="firstName">First name</label
+        ><input id="firstName" pInputText formControlName="firstName" placeholder="Ahmed" />
+        @if (isInvalid('firstName')) {
+          <p-message severity="error" [closable]="false">First name is required.</p-message>
+        }
+      </div>
+      <div class="field">
+        <label for="lastName">Last name</label
+        ><input id="lastName" pInputText formControlName="lastName" placeholder="Ali" />
+        @if (isInvalid('lastName')) {
+          <p-message severity="error" [closable]="false">Last name is required.</p-message>
+        }
+      </div>
+      <div class="field">
+        <label for="email">Email</label
+        ><input
+          id="email"
+          type="email"
+          pInputText
+          formControlName="email"
+          placeholder="member@example.com"
+        />
+        @if (isInvalid('email')) {
+          <p-message severity="error" [closable]="false">Enter a valid email.</p-message>
+        }
+      </div>
+      <div class="field">
+        <label for="phoneNumber">Phone number</label
+        ><input
+          id="phoneNumber"
+          pInputText
+          formControlName="phoneNumber"
+          placeholder="+20 123 456 7890"
+        />
+      </div>
+      <div class="field">
+        <label for="dateOfBirth">Date of birth</label
+        ><input id="dateOfBirth" type="date" pInputText formControlName="dateOfBirth" />
+      </div>
+      <div class="field">
+        <label for="joinDate">Join date</label
+        ><input id="joinDate" type="date" pInputText formControlName="joinDate" />
+      </div>
+      @if (editingId === null) {
+        <div class="field field--full">
+          <label for="password">Temporary password</label
+          ><input
+            id="password"
+            type="password"
+            pInputText
+            formControlName="password"
+            placeholder="At least 6 characters"
+          />
+          @if (isInvalid('password')) {
+            <p-message severity="error" [closable]="false"
+              >Password must be at least 6 characters.</p-message
+            >
+          }
+        </div>
+      }
+      <div class="field field--full">
+        <label for="notes">Notes <span>(optional)</span></label
+        ><textarea
+          id="notes"
+          pInputText
+          formControlName="notes"
+          rows="3"
+          placeholder="Goals, preferences, or anything the team should know..."
+        ></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [text]="true"
+        type="button"
+        (onClick)="memberDialogVisible = false"
+      /><p-button
+        [label]="editingId === null ? 'Add member' : 'Save changes'"
+        icon="pi pi-check"
+        type="submit"
+        [loading]="saving()"
+      />
+    </div>
+  </form>
+</p-dialog>
+<p-dialog
+  [(visible)]="detailDialogVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(760px, calc(100vw - 2rem))' }"
+  header="Member profile"
+>
+  @if (selectedMember(); as member) {
+    <div class="profile-detail">
+      <div class="profile-hero">
+        <p-avatar [image]="imageUrl(member.imageUrl)" shape="circle" size="xlarge" />
+        <div>
+          <span class="eyebrow">MEMBER #{{ member.memberId.toString().padStart(4, '0') }}</span>
+          <h2>{{ fullName(member) }}</h2>
+          <span>{{ member.email }}</span>
+        </div>
+        <p-button
+          label="Edit profile"
+          icon="pi pi-pencil"
+          [outlined]="true"
+          (onClick)="detailDialogVisible = false; openEdit(member)"
+        />
+      </div>
+      <div class="detail-stats">
+        <div>
+          <span>Joined</span><strong>{{ member.joinDate | date: 'MMM d, y' }}</strong>
+        </div>
+        <div>
+          <span>Phone</span><strong>{{ member.phoneNumber || '—' }}</strong>
+        </div>
+        <div>
+          <span>Latest plan</span
+          ><strong>{{ latestSubscription()?.planName || 'No plan yet' }}</strong>
+        </div>
+        <div>
+          <span>Visits logged</span><strong>{{ attendances().length }}</strong>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">NOW</span>
+            <h3>Membership pulse</h3>
+          </div>
+          @if (latestSubscription()) {
+            <p-tag
+              [value]="latestSubscription()!.status"
+              [severity]="statusSeverity(latestSubscription()!.status)"
+            />
+          }
+        </div>
+        @if (latestSubscription(); as subscription) {
+          <div class="subscription-banner">
+            <div class="plan-mark"><i class="pi pi-id-card"></i></div>
+            <div>
+              <strong>{{ subscription.planName }}</strong
+              ><span
+                >{{ subscription.startDate | date: 'MMM d' }} —
+                {{ subscription.endDate | date: 'MMM d, y' }}</span
+              >
+            </div>
+            <strong class="plan-price">{{ subscription.price | number }} EGP</strong>
+          </div>
+        } @else {
+          <div class="muted-state">No subscription history available.</div>
+        }
+      </div>
+      <div class="detail-columns">
+        <div class="detail-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">RECENT</span>
+              <h3>Attendance</h3>
+            </div>
+          </div>
+          @for (attendance of attendances().slice(0, 4); track attendance.attendanceId) {
+            <div class="activity-row">
+              <i class="pi pi-sign-in"></i
+              ><span>{{ attendance.checkInAtUtc | date: 'EEE, MMM d · h:mm a' }}</span>
+            </div>
+          }
+          @if (!attendances().length && !detailLoading()) {
+            <div class="muted-state">No visits recorded yet.</div>
+          }
+        </div>
+        <div class="detail-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">HISTORY</span>
+              <h3>Payments</h3>
+            </div>
+          </div>
+          @for (payment of payments().slice(0, 4); track payment.paymentId) {
+            <div class="activity-row">
+              <i class="pi pi-wallet"></i
+              ><span>{{ payment.planName }} · {{ payment.amount | number }} EGP</span
+              ><p-tag [value]="payment.status" [severity]="statusSeverity(payment.status)" />
+            </div>
+          }
+          @if (!payments().length && !detailLoading()) {
+            <div class="muted-state">No payments recorded yet.</div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</p-dialog>

@@ -1,0 +1,74 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(680px, calc(100vw - 2rem))' }"
+  header="Invoice"
+>
+  <div class="invoice-dialog">
+    @if (loading()) {
+      <div class="invoice-state">
+        <i class="pi pi-spin pi-spinner"></i>
+        <strong>Preparing your invoice</strong>
+        <span>Loading the saved payment snapshot…</span>
+      </div>
+    } @else if (error()) {
+      <div class="invoice-state invoice-state--error">
+        <span class="invoice-state__icon"><i class="pi pi-file-excel"></i></span>
+        <strong>Invoice unavailable</strong>
+        <span>{{ error() }}</span>
+        <p-button label="Try again" icon="pi pi-refresh" [outlined]="true" (onClick)="loadInvoice()" />
+      </div>
+    } @else if (invoice(); as invoice) {
+      <div class="invoice-hero">
+        <div class="invoice-hero__mark"><i class="pi pi-receipt"></i></div>
+        <div>
+          <span class="invoice-eyebrow">GYM MANAGEMENT · PAYMENT RECEIPT</span>
+          <h2>{{ invoice.invoiceNumber }}</h2>
+          <span>Issued {{ invoice.issuedAt | date: 'MMM d, y · h:mm a' }}</span>
+        </div>
+        <div class="invoice-hero__total">
+          <span>Total paid</span>
+          <strong>{{ invoice.total | number }} <small>EGP</small></strong>
+        </div>
+      </div>
+
+      <div class="invoice-context">
+        <div>
+          <span>Billed to</span>
+          <strong>{{ invoice.memberName }}</strong>
+        </div>
+        <div>
+          <span>Membership plan</span>
+          <strong>{{ invoice.planName }}</strong>
+        </div>
+        <div>
+          <span>Subscription period</span>
+          <strong>{{ invoice.subscriptionStartDate | date: 'MMM d, y' }} – {{ invoice.subscriptionEndDate | date: 'MMM d, y' }}</strong>
+        </div>
+      </div>
+
+      <div class="invoice-section-title"><span>Payment summary</span><i class="pi pi-sparkles"></i></div>
+      <div class="invoice-summary">
+        <div><span>Subtotal</span><strong>{{ invoice.subTotal | number }} EGP</strong></div>
+        <div class="invoice-summary__discount"><span>Discount</span><strong>−{{ invoice.discount | number }} EGP</strong></div>
+        @if (invoice.promoCode) {
+          <div><span>Promo code</span><strong class="invoice-code">{{ invoice.promoCode }}</strong></div>
+        }
+        <div><span>Tax</span><strong>{{ invoice.tax | number }} EGP</strong></div>
+        <div class="invoice-summary__total"><span>Total</span><strong>{{ invoice.total | number }} EGP</strong></div>
+      </div>
+
+      <div class="invoice-payment">
+        <div><span><i class="pi pi-credit-card"></i> Payment method</span><strong>{{ paymentMethodLabel(invoice.paymentMethod) }}</strong></div>
+        <div><span><i class="pi pi-hashtag"></i> Payment reference</span><strong>{{ invoice.paymentReference || 'Not provided' }}</strong></div>
+      </div>
+
+      <div class="invoice-actions">
+        <p-button label="Close" severity="secondary" [text]="true" (onClick)="visible.set(false)" />
+        <p-button label="Download invoice" icon="pi pi-download" [loading]="downloading()" (onClick)="downloadInvoice()" />
+      </div>
+    }
+  </div>
+</p-dialog>

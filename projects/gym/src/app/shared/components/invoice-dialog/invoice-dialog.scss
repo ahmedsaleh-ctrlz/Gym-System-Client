@@ -1,0 +1,252 @@
+:host {
+  display: block;
+}
+
+.invoice-dialog {
+  padding-top: 0.15rem;
+}
+
+.invoice-hero {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--p-primary-color) 20%, var(--p-content-border-color));
+  border-radius: 15px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--p-primary-color) 12%, transparent), transparent);
+}
+
+.invoice-hero__mark,
+.invoice-state__icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--p-primary-color) 16%, transparent);
+  font-size: 1.05rem;
+}
+
+.invoice-hero > div:nth-child(2) {
+  min-width: 0;
+  flex: 1;
+}
+
+.invoice-eyebrow {
+  color: var(--p-text-muted-color);
+  font-size: 0.57rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.invoice-hero h2 {
+  margin: 0.3rem 0 0.15rem;
+  font-size: 1.1rem;
+  letter-spacing: -0.03em;
+}
+
+.invoice-hero > div:nth-child(2) > span:last-child {
+  color: var(--p-text-muted-color);
+  font-size: 0.64rem;
+}
+
+.invoice-hero__total {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 0.2rem;
+  text-align: right;
+}
+
+.invoice-hero__total span,
+.invoice-context span,
+.invoice-summary span,
+.invoice-payment span {
+  color: var(--p-text-muted-color);
+  font-size: 0.63rem;
+}
+
+.invoice-hero__total strong {
+  color: var(--p-primary-color);
+  font-size: 1.2rem;
+}
+
+.invoice-hero__total small {
+  font-size: 0.57rem;
+}
+
+.invoice-context {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.7rem;
+  padding: 1rem 0;
+}
+
+.invoice-context > div,
+.invoice-summary > div,
+.invoice-payment > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.invoice-context > div:last-child {
+  grid-column: 1 / -1;
+}
+
+.invoice-context strong {
+  font-size: 0.73rem;
+}
+
+.invoice-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 0 0.55rem;
+  border-top: 1px solid var(--p-content-border-color);
+  color: var(--p-text-color);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.invoice-section-title i {
+  color: var(--p-primary-color);
+  font-size: 0.75rem;
+}
+
+.invoice-summary {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--p-primary-color) 6%, transparent);
+}
+
+.invoice-summary > div {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.invoice-summary strong {
+  font-size: 0.7rem;
+}
+
+.invoice-summary__discount strong {
+  color: var(--p-green-500);
+}
+
+.invoice-summary .invoice-code {
+  color: var(--p-primary-color);
+  letter-spacing: 0.08em;
+}
+
+.invoice-summary__total {
+  padding-top: 0.65rem;
+  margin-top: 0.15rem;
+  border-top: 1px solid var(--p-content-border-color);
+}
+
+.invoice-summary__total span {
+  color: var(--p-text-color);
+  font-weight: 700;
+}
+
+.invoice-summary__total strong {
+  color: var(--p-primary-color);
+  font-size: 0.95rem;
+}
+
+.invoice-payment {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.7rem;
+  padding: 1rem 0 0.1rem;
+}
+
+.invoice-payment span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.invoice-payment span i {
+  color: var(--p-primary-color);
+}
+
+.invoice-payment strong {
+  overflow: hidden;
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.invoice-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid var(--p-content-border-color);
+}
+
+.invoice-state {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-height: 230px;
+  justify-content: center;
+  color: var(--p-text-muted-color);
+  text-align: center;
+}
+
+.invoice-state > i {
+  color: var(--p-primary-color);
+  font-size: 1.5rem;
+}
+
+.invoice-state strong {
+  color: var(--p-text-color);
+  font-size: 0.85rem;
+}
+
+.invoice-state span:not(.invoice-state__icon) {
+  max-width: 310px;
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.invoice-state--error .invoice-state__icon {
+  color: var(--p-orange-500);
+  background: color-mix(in srgb, var(--p-orange-500) 14%, transparent);
+}
+
+@media (max-width: 560px) {
+  .invoice-hero {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .invoice-hero__total {
+    width: 100%;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--p-content-border-color);
+    text-align: left;
+  }
+
+  .invoice-context,
+  .invoice-payment {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-context > div:last-child {
+    grid-column: auto;
+  }
+
+  .invoice-actions p-button {
+    flex: 1;
+  }
+}

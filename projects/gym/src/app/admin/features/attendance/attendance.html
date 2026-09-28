@@ -1,0 +1,285 @@
+<p-toast />
+
+<div class="attendance-page">
+  <header class="attendance-header">
+    <div>
+      <span class="eyebrow">OPERATIONS / FRONT DESK</span>
+      <h1>Attendance</h1>
+      <p>Keep every arrival visible, searchable and easy to record.</p>
+    </div>
+    <p-button label="Check in member" icon="pi pi-sign-in" (onClick)="openCheckIn()" />
+  </header>
+
+  <section class="attendance-card">
+    <div class="attendance-toolbar">
+      <div>
+        <span class="eyebrow">THE DAILY LOG</span>
+        <h2>
+          Check-in activity <small>{{ total() | number }} records</small>
+        </h2>
+      </div>
+      <div class="toolbar-actions">
+        <div class="search-box">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            #attendanceSearch
+            type="search"
+            placeholder="Search member name"
+            [value]="searchTerm()"
+            (input)="applySearch(attendanceSearch.value)"
+          />
+        </div>
+        <p-button
+          [icon]="sortDirection() === 'desc' ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up'"
+          [label]="sortDirection() === 'desc' ? 'Latest first' : 'Earliest first'"
+          [text]="true"
+          severity="secondary"
+          (onClick)="toggleSort()"
+        />
+        <p-button
+          icon="pi pi-refresh"
+          [text]="true"
+          severity="secondary"
+          ariaLabel="Refresh attendance"
+          (onClick)="loadAttendance()"
+        />
+      </div>
+    </div>
+
+    <div class="date-filters">
+      <div class="date-field">
+        <label for="attendanceFrom">From</label>
+        <input
+          id="attendanceFrom"
+          type="date"
+          [value]="dateFrom()"
+          (change)="dateFrom.set($any($event.target).value); applyDateFilters()"
+        />
+      </div>
+      <div class="date-field">
+        <label for="attendanceTo">To</label>
+        <input
+          id="attendanceTo"
+          type="date"
+          [value]="dateTo()"
+          (change)="dateTo.set($any($event.target).value); applyDateFilters()"
+        />
+      </div>
+      @if (dateFrom() || dateTo() || searchTerm()) {
+        <p-button
+          label="Clear filters"
+          [text]="true"
+          severity="secondary"
+          (onClick)="clearFilters()"
+        />
+      }
+    </div>
+
+    <p-table
+      [value]="records()"
+      [loading]="loading()"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="pageSize"
+      [totalRecords]="total()"
+      [first]="(pageNumber - 1) * pageSize"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first}–{last} of {totalRecords}"
+      (onPage)="loadAttendance($event.first / $event.rows + 1)"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Member</th>
+          <th>Member ID</th>
+          <th>Date</th>
+          <th>Check-in time</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-record>
+        <tr>
+          <td>
+            <div class="member-cell">
+              @if (recordImageUrl(record); as imageUrl) {
+                <img class="attendance-avatar" [src]="imageUrl" [alt]="record.memberName" />
+              } @else {
+                <span class="member-avatar">{{ record.memberName.charAt(0) }}</span>
+              }
+              <strong>{{ record.memberName }}</strong>
+            </div>
+          </td>
+          <td>
+            <span class="member-id">#{{ record.memberId }}</span>
+          </td>
+          <td>{{ record.checkInAtUtc | date: 'MMM d, y' }}</td>
+          <td>
+            <strong class="check-in-time">{{ record.checkInAtUtc | date: 'h:mm a' }}</strong>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5">
+            <div class="empty-state">
+              <i class="pi pi-calendar-clock"></i>
+              <strong>No attendance records found</strong>
+              <span>Try a different member name or date range.</span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+</div>
+
+<p-dialog
+  [(visible)]="checkInVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(500px, calc(100vw - 2rem))' }"
+  header="Check in member"
+>
+  <div class="check-in-dialog">
+    <div class="dialog-intro">
+      <div class="intro-icon"><i class="pi pi-bolt"></i></div>
+      <div>
+        <strong>Make the front desk moment effortless</strong>
+        <span>Search for a member, then record their arrival instantly.</span>
+      </div>
+    </div>
+
+    <label for="quickMemberSearch">Member</label>
+    <div class="member-picker">
+      <div class="member-search-field">
+        <i class="pi pi-search"></i>
+        <input
+          #quickMemberInput
+          id="quickMemberSearch"
+          type="search"
+          autocomplete="off"
+          placeholder="Search by first or last name"
+          [value]="memberSearchTerm()"
+          [attr.aria-expanded]="memberPickerOpen()"
+          (focus)="memberPickerOpen.set(memberSearchResults().length > 0)"
+          (input)="searchMembers(quickMemberInput.value)"
+        />
+        @if (memberSearchLoading()) {
+          <i class="pi pi-spin pi-spinner"></i>
+        } @else if (memberSearchTerm()) {
+          <button
+            type="button"
+            class="clear-search"
+            aria-label="Clear member search"
+            (click)="clearMemberSearch()"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        }
+      </div>
+      @if (memberPickerOpen()) {
+        <div class="member-results" role="listbox">
+          @if (memberSearchLoading()) {
+            <div class="result-state"><i class="pi pi-spin pi-spinner"></i> Finding members…</div>
+          } @else if (memberSearchTerm() && !memberSearchResults().length) {
+            <div class="result-state">
+              <i class="pi pi-user-minus"></i> No matching members found
+            </div>
+          } @else {
+            @for (member of memberSearchResults(); track member.memberId) {
+              <button
+                type="button"
+                class="member-result"
+                role="option"
+                (click)="selectMember(member)"
+              >
+                <p-avatar [image]="memberImageUrl(member)" />
+                <span
+                  ><strong>{{ fullName(member) }}</strong
+                  ><small>{{ member.email }} · #{{ member.memberId }}</small></span
+                >
+              </button>
+            }
+          }
+        </div>
+      }
+    </div>
+
+    @if (selectedMember(); as member) {
+      <div class="selected-member">
+        @if (memberImageUrl(member); as imageUrl) {
+          <a
+            class="member-photo-link"
+            [href]="imageUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open full member photo"
+            (click)="$event.preventDefault(); openImagePreview(member)"
+          >
+            <img [src]="imageUrl" [alt]="fullName(member)" />
+            <span class="photo-expand"><i class="pi pi-expand"></i></span>
+          </a>
+        } @else {
+          <p-avatar [image]="memberImageUrl(member)" />
+        }
+        <div>
+          <strong>{{ fullName(member) }}</strong
+          ><small>Ready to check in · #{{ member.memberId }}</small>
+        </div>
+        <i class="pi pi-check-circle"></i>
+      </div>
+    }
+
+    <div class="dialog-actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [text]="true"
+        (onClick)="checkInVisible = false"
+      />
+      <p-button
+        label="Check in member"
+        icon="pi pi-sign-in"
+        [disabled]="!selectedMember()"
+        [loading]="checkInLoading()"
+        (onClick)="checkInSelectedMember()"
+      />
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="imagePreviewVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(620px, calc(100vw - 2rem))' }"
+  header="Verify member identity"
+>
+  @if (previewMember(); as member) {
+    <div class="image-preview">
+      <div class="image-preview-heading">
+        <div>
+          <span class="eyebrow">PROFILE PHOTO</span>
+          <h2>{{ fullName(member) }}</h2>
+          <span>Member #{{ member.memberId }}</span>
+        </div>
+        <i class="pi pi-shield"></i>
+      </div>
+      @if (memberImageUrl(member); as imageUrl) {
+        <a [href]="imageUrl" target="_blank" rel="noopener noreferrer" class="image-preview-frame">
+          <img [src]="imageUrl" [alt]="fullName(member)" />
+        </a>
+        <p class="image-preview-hint">
+          <i class="pi pi-external-link"></i> Open original image in a new tab
+        </p>
+      } @else {
+        <div class="image-preview-empty">
+          <i class="pi pi-image"></i>
+          <strong>No profile photo available</strong>
+          <span>Continue only after verifying the member with another identifier.</span>
+        </div>
+      }
+    </div>
+  }
+</p-dialog>

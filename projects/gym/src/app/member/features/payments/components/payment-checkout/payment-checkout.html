@@ -1,0 +1,112 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(520px, calc(100vw - 2rem))' }"
+  header="Secure card payment"
+  (onHide)="closeCheckout()"
+>
+  @if (payment(); as payment) {
+    <div class="secure-checkout">
+      <div class="checkout-intro">
+        <span class="checkout-icon"><i class="pi pi-lock"></i></span>
+        <div>
+          <span class="eyebrow">SECURE PAYMENT</span><strong>{{ payment.planName }}</strong
+          ><small>Visa and card payments are securely processed by Stripe.</small>
+        </div>
+      </div>
+      <div class="checkout-amount">
+        <div class="checkout-price-label"><span>Total due</span><span>EGP</span></div>
+        @if (promoPreview(); as promo) {
+          <div class="checkout-price-breakdown">
+            <div>
+              <span>Original price</span><strong>{{ payment.amount | number }} EGP</strong>
+            </div>
+            <div class="checkout-discount">
+              <span>{{ promo.code }} · {{ promoDiscountLabel(promo) }}</span
+              ><strong>-{{ discountAmount() | number }} EGP</strong>
+            </div>
+            <div class="checkout-final">
+              <span>Final amount</span
+              ><strong>{{ finalAmount() | number }} <small>EGP</small></strong>
+            </div>
+          </div>
+        } @else {
+          <strong class="checkout-total">{{ payment.amount | number }} <small>EGP</small></strong>
+        }
+      </div>
+      <div class="promo-code-panel">
+        <div class="promo-code-heading">
+          <div><span class="eyebrow">OPTIONAL SAVING</span><strong>Have a promo code?</strong></div>
+          @if (promoPreview()) {
+            <button type="button" class="promo-remove" (click)="removePromoCode()">
+              <i class="pi pi-times"></i> Remove
+            </button>
+          }
+        </div>
+        @if (promoPreview(); as promo) {
+          <div class="promo-applied">
+            <span class="promo-applied-icon"><i class="pi pi-check"></i></span>
+            <div>
+              <strong>{{ promo.code }} applied</strong
+              ><small>{{ promoDiscountLabel(promo) }} · validated for {{ promo.planName }}</small>
+            </div>
+          </div>
+        } @else {
+          <div class="promo-code-entry">
+            <input
+              pInputText
+              type="text"
+              autocomplete="off"
+              placeholder="Enter promo code"
+              [value]="promoCode()"
+              (input)="onPromoCodeInput($event)"
+              (keydown.enter)="$event.preventDefault(); applyPromoCode()"
+            /><p-button
+              label="Apply"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              size="small"
+              [loading]="applyingPromo()"
+              [disabled]="!promoCode().trim() || preparingPayment()"
+              (onClick)="applyPromoCode()"
+            />
+          </div>
+        }
+        @if (promoError()) {
+          <small class="promo-error"><i class="pi pi-info-circle"></i>{{ promoError() }}</small>
+        }
+      </div>
+      @if (paymentError()) {
+        <div class="payment-error">
+          <i class="pi pi-exclamation-circle"></i><span>{{ paymentError() }}</span>
+        </div>
+      } @else if (preparingPayment()) {
+        <div class="payment-preparing">
+          <i class="pi pi-spin pi-spinner"></i><span>Preparing your secure checkout…</span>
+        </div>
+      } @else {
+        <label class="card-label">Card details</label>
+        <div #cardElement class="stripe-card-element"></div>
+        <small class="card-hint"
+          ><i class="pi pi-shield"></i> Your card details never touch our servers.</small
+        >
+      }
+      <div class="dialog-actions">
+        <p-button
+          label="Cancel"
+          [text]="true"
+          severity="secondary"
+          (onClick)="closeCheckout()"
+        /><p-button
+          label="Pay securely"
+          icon="pi pi-lock"
+          [loading]="paying()"
+          [disabled]="!!paymentError() || preparingPayment() || applyingPromo()"
+          (onClick)="payWithCard()"
+        />
+      </div>
+    </div>
+  }
+</p-dialog>

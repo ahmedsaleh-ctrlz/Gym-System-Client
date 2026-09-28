@@ -1,0 +1,48 @@
+<div class="notification-center">
+  <button
+    type="button"
+    class="notification-trigger"
+    [class.is-open]="opened()"
+    [attr.aria-expanded]="opened()"
+    aria-label="Notifications"
+    (click)="toggle()"
+  >
+    <i class="pi pi-bell"></i>
+    @if (center.unreadCount() > 0) {
+      <span class="notification-badge">{{ center.unreadCount() > 99 ? '99+' : center.unreadCount() }}</span>
+    }
+  </button>
+
+  @if (opened()) {
+    <section class="notification-popover" aria-label="Notifications panel">
+      <header class="notification-header">
+        <div><span class="notification-kicker">YOUR UPDATES</span><h2>Notifications</h2></div>
+        <p-button label="Mark all read" [text]="true" size="small" [disabled]="center.unreadCount() === 0" (onClick)="center.markAllAsRead()" />
+      </header>
+
+      <div class="notification-tabs" role="tablist">
+        <button type="button" [class.active]="center.activeFilter() === 'all'" (click)="selectFilter('all')">All</button>
+        <button type="button" [class.active]="center.activeFilter() === 'unread'" (click)="selectFilter('unread')">Unread <span>{{ center.unreadCount() }}</span></button>
+      </div>
+
+      @if (center.loading()) {
+        <div class="notification-state"><i class="pi pi-spin pi-spinner"></i><span>Loading notifications…</span></div>
+      } @else if (!center.notifications().length) {
+        <div class="notification-state"><i class="pi pi-check-circle"></i><strong>{{ center.activeFilter() === 'unread' ? 'No unread notifications' : 'No notifications' }}</strong><span>You’re all caught up.</span></div>
+      } @else {
+        <div class="notification-list">
+          @for (notification of center.notifications(); track notification.id) {
+            <button type="button" class="notification-item" [class.unread]="!notification.isRead" (click)="openNotification(notification)">
+              <span class="notification-type" [class]="'notification-type notification-type--' + typeMeta(notification.type).tone"><i [class]="typeMeta(notification.type).icon"></i></span>
+              <span class="notification-content"><strong>{{ notification.title }}</strong><span>{{ notification.message }}</span><small>{{ relativeTime(notification.createdAt) }} · {{ typeMeta(notification.type).label }}</small></span>
+              @if (!notification.isRead) { <span class="unread-dot"></span> }
+            </button>
+          }
+        </div>
+        @if (center.canLoadMore()) {
+          <button type="button" class="load-more" [disabled]="center.loadingMore()" (click)="center.loadMore()">{{ center.loadingMore() ? 'Loading…' : 'Load more' }}</button>
+        }
+      }
+    </section>
+  }
+</div>

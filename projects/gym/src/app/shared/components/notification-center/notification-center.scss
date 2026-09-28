@@ -1,0 +1,224 @@
+:host {
+  display: inline-flex;
+  position: relative;
+  z-index: 9999;
+}
+.notification-center {
+  position: relative;
+  z-index: 9999;
+  display: inline-flex;
+}
+.notification-trigger {
+  position: relative;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--p-text-muted-color);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+.notification-trigger:hover,
+.notification-trigger.is-open {
+  color: var(--p-primary-color);
+}
+.notification-trigger i {
+  font-size: 1rem;
+}
+.notification-badge {
+  position: absolute;
+  top: -1px;
+  right: -2px;
+  display: grid;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 0.2rem;
+  place-items: center;
+  border: 2px solid var(--p-content-background);
+  border-radius: 99px;
+  background: var(--p-red-500);
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 800;
+}
+.notification-popover {
+  position: absolute;
+  z-index: 10000;
+  top: calc(100% + 0.65rem);
+  right: 0;
+  display: flex;
+  width: min(390px, calc(100vw - 2rem));
+  max-height: min(620px, calc(100vh - 6rem));
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 18px;
+  background: var(--p-content-background);
+  box-shadow: 0 1.5rem 4rem rgb(15 23 42 / 22%);
+}
+.notification-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 1rem 1rem 0.8rem;
+  border-bottom: 1px solid var(--p-content-border-color);
+}
+.notification-kicker {
+  color: var(--p-text-muted-color);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+.notification-header h2 {
+  margin: 0.3rem 0 0;
+  font-size: 1rem;
+}
+.notification-header p-button {
+  flex: 0 0 auto;
+}
+.notification-tabs {
+  display: flex;
+  gap: 0.2rem;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid var(--p-content-border-color);
+}
+.notification-tabs button {
+  padding: 0.45rem 0.65rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--p-text-muted-color);
+  font: inherit;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+.notification-tabs button.active {
+  background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
+  color: var(--p-primary-color);
+  font-weight: 700;
+}
+.notification-tabs button span {
+  margin-left: 0.2rem;
+  color: var(--p-primary-color);
+}
+.notification-list {
+  overflow: auto;
+}
+.notification-item {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.8rem 1rem;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--p-content-border-color) 70%, transparent);
+  background: transparent;
+  color: var(--p-text-color);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.notification-item:hover {
+  background: color-mix(in srgb, var(--p-text-color) 12%, transparent);
+}
+.notification-item.unread {
+  background: color-mix(in srgb, var(--p-primary-color) 4%, transparent);
+}
+.notification-type {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+.notification-type--primary {
+  background: color-mix(in srgb, var(--p-primary-color) 13%, transparent);
+  color: var(--p-primary-color);
+}
+.notification-type--success {
+  background: color-mix(in srgb, var(--p-green-500) 13%, transparent);
+  color: var(--p-green-500);
+}
+.notification-type--warning {
+  background: color-mix(in srgb, var(--p-orange-500) 13%, transparent);
+  color: var(--p-orange-500);
+}
+.notification-content {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+.notification-content strong {
+  overflow: hidden;
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.notification-content > span {
+  color: var(--p-text-muted-color);
+  font-size: 0.67rem;
+  line-height: 1.4;
+}
+.notification-content small {
+  color: var(--p-text-muted-color);
+  font-size: 0.58rem;
+}
+.unread-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  margin-top: 0.35rem;
+  border-radius: 50%;
+  background: var(--p-primary-color);
+}
+.notification-state {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 2.8rem 1rem;
+  color: var(--p-text-muted-color);
+  text-align: center;
+}
+.notification-state i {
+  color: var(--p-primary-color);
+  font-size: 1.35rem;
+}
+.notification-state strong {
+  color: var(--p-text-color);
+  font-size: 0.76rem;
+}
+.notification-state span {
+  font-size: 0.64rem;
+}
+.load-more {
+  width: calc(100% - 2rem);
+  padding: 0.6rem;
+  margin: 0.5rem 1rem 1rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--p-primary-color);
+  font: inherit;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+.load-more:hover {
+  background: color-mix(in srgb, var(--p-primary-color) 7%, transparent);
+}
+.load-more:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}

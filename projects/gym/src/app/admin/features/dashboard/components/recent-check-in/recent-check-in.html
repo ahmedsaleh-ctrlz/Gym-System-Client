@@ -1,0 +1,44 @@
+<div class="checkins-card">
+  <div class="checkins-card__header">
+    <div>
+      <span class="checkins-card__label">ACTIVITY</span>
+      <h2>Recent Check-ins</h2>
+    </div>
+
+    <button type="button" class="view-all" routerLink="/admin/attendance">
+      View all
+      <i class="pi pi-arrow-up-right"></i>
+    </button>
+  </div>
+
+  <div class="checkins-list">
+    @for (checkIn of checkIns(); track checkIn.memberId) {
+      <div class="checkin-row">
+        <div class="member">
+          @if (imageSource(checkIn.imageUrl, checkIn.memberId); as image) {
+            <img
+              class="member-photo"
+              [src]="image"
+              [alt]="checkIn.memberName"
+              (error)="markImageAsFailed(checkIn.memberId)"
+            />
+          } @else {
+            <span class="member-photo member-photo--initials">{{
+              initials(checkIn.memberName)
+            }}</span>
+          }
+
+          <div class="member-info">
+            <strong>{{ checkIn.memberName }}</strong>
+            <span>Member #{{ checkIn.memberId }}</span>
+          </div>
+        </div>
+
+        <div class="checkin-time">
+          <span>Check-in</span>
+          <strong>{{ checkIn.checkInAtUtc | date: 'hh:mm a' }}</strong>
+        </div>
+      </div>
+    }
+  </div>
+</div>

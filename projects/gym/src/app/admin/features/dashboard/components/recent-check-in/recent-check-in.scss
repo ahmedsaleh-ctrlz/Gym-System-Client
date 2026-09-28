@@ -1,0 +1,158 @@
+:host {
+  display: block;
+}
+
+.checkins-card {
+  padding: 1.35rem;
+
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--p-border-radius);
+
+  box-shadow: var(--p-card-shadow);
+}
+
+.checkins-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  margin-bottom: 1rem;
+}
+
+.checkins-card__label {
+  display: block;
+  margin-bottom: 0.4rem;
+
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+
+  color: var(--p-text-muted-color);
+}
+
+.checkins-card h2 {
+  margin: 0;
+
+  font-size: 1rem;
+  font-weight: 650;
+
+  color: var(--p-text-color);
+}
+
+.view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  color: var(--p-primary-color);
+
+  font-size: 0.72rem;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.view-all i {
+  font-size: 0.65rem;
+}
+
+.checkins-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  padding: 0.9rem 0;
+
+  border-bottom: 1px solid var(--p-content-border-color);
+}
+
+.checkin-row:last-child {
+  border-bottom: 0;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  min-width: 0;
+}
+
+.member-photo {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 auto;
+
+  object-fit: cover;
+  border-radius: 50%;
+
+  background: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
+}
+
+.member-info {
+  min-width: 0;
+}
+
+.member-info strong {
+  display: block;
+
+  overflow: hidden;
+
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  color: var(--p-text-color);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-info span {
+  display: block;
+  margin-top: 0.2rem;
+
+  font-size: 0.68rem;
+  color: var(--p-text-muted-color);
+}
+
+.checkin-time {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.checkin-time span {
+  display: block;
+
+  font-size: 0.63rem;
+  color: var(--p-text-muted-color);
+}
+
+.checkin-time strong {
+  display: block;
+  margin-top: 0.15rem;
+
+  font-size: 0.75rem;
+  color: var(--p-text-color);
+}
+
+@media (max-width: 600px) {
+  .checkin-row {
+    align-items: flex-start;
+  }
+
+  .checkin-time {
+    text-align: left;
+  }
+}

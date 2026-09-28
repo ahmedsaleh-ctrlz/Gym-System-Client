@@ -1,0 +1,32 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="false"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(500px, calc(100vw - 2rem))' }"
+  header="Payment successful"
+>
+  @if (payment(); as payment) {
+    <div class="success-state">
+      <div class="success-icon"><i class="pi pi-check"></i></div>
+      <span class="eyebrow">PAYMENT SUCCESSFUL 🎉</span>
+      <h2>Your payment is complete.</h2>
+      <p>{{ payment.planName }} · {{ payment.amount | number }} EGP</p>
+      <small>Your membership will be updated automatically by the backend.</small>
+      <div class="dialog-actions">
+        <p-button
+          label="View payment"
+          [text]="true"
+          severity="secondary"
+          (onClick)="viewPayment.emit()"
+        /><p-button
+          label="View membership"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          (onClick)="viewMembership.emit()"
+        />
+      </div>
+    </div>
+  }
+</p-dialog>

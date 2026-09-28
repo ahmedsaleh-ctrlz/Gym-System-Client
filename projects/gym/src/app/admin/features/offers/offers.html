@@ -1,0 +1,395 @@
+<p-toast />
+<p-confirmdialog />
+
+<div class="offers-page">
+  <header class="offers-header">
+    <div>
+      <span class="eyebrow">SALES / PROMOTIONS</span>
+      <h1>Offers &amp; Coupons</h1>
+      <p>Build thoughtful incentives and keep every discount under control.</p>
+    </div>
+    <p-button label="Create coupon" icon="pi pi-plus" (onClick)="openCreate()" />
+  </header>
+
+  <section class="offers-banner">
+    <div class="offers-banner__icon"><i class="pi pi-ticket"></i></div>
+    <div>
+      <span class="eyebrow">THE PROMOTION DESK</span>
+      <h2>Make the right offer at the right time.</h2>
+      <p>Every coupon belongs to one plan, with clear limits and a visible redemption trail.</p>
+    </div>
+    <div class="offers-banner__signal"><i class="pi pi-sparkles"></i><span>Live catalog</span></div>
+  </section>
+
+  <section class="offers-stats">
+    <article class="offers-stat offers-stat--accent">
+      <div class="offers-stat__icon"><i class="pi pi-ticket"></i></div>
+      <div>
+        <span>Active coupons</span><strong>{{ activeCount() }}</strong
+        ><small>ready for members</small>
+      </div>
+    </article>
+    <article class="offers-stat">
+      <div class="offers-stat__icon offers-stat__icon--green">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div>
+        <span>Total redemptions</span><strong>{{ redemptionCount() | number }}</strong
+        ><small>successful uses</small>
+      </div>
+    </article>
+    <article class="offers-stat">
+      <div class="offers-stat__icon offers-stat__icon--purple"><i class="pi pi-list"></i></div>
+      <div>
+        <span>Plans covered</span><strong>{{ plansCovered() }}</strong
+        ><small>catalog connections</small>
+      </div>
+    </article>
+    <article class="offers-stat">
+      <div class="offers-stat__icon offers-stat__icon--orange"><i class="pi pi-clock"></i></div>
+      <div>
+        <span>Expiring soon</span><strong>{{ expiringSoonCount() }}</strong
+        ><small>within 30 days</small>
+      </div>
+    </article>
+  </section>
+
+  <section class="offers-workspace">
+    <div class="offers-toolbar">
+      <div>
+        <span class="eyebrow">COUPON CATALOG</span>
+        <h2>Offers that move membership forward</h2>
+      </div>
+      <div class="offers-search">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          #offerSearch
+          type="search"
+          placeholder="Search code or plan…"
+          [value]="searchTerm()"
+          (input)="applySearch(offerSearch.value)"
+        />
+        @if (searchTerm()) {
+          <button type="button" aria-label="Clear search" (click)="clearSearch()">
+            <i class="pi pi-times"></i>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="offers-filters">
+      <button
+        type="button"
+        [class.is-active]="activeFilter() === null"
+        (click)="setStatusFilter(null)"
+      >
+        <i class="pi pi-th-large"></i> All <span>{{ promos().length }}</span>
+      </button>
+      <button
+        type="button"
+        [class.is-active]="activeFilter() === true"
+        (click)="setStatusFilter(true)"
+      >
+        <i class="pi pi-check-circle"></i> Active <span>{{ activeCount() }}</span>
+      </button>
+      <button
+        type="button"
+        [class.is-active]="activeFilter() === false"
+        (click)="setStatusFilter(false)"
+      >
+        <i class="pi pi-ban"></i> Inactive <span>{{ promos().length - activeCount() }}</span>
+      </button>
+      <p-button
+        icon="pi pi-refresh"
+        [text]="true"
+        severity="secondary"
+        ariaLabel="Refresh coupons"
+        (onClick)="loadPromos()"
+      />
+    </div>
+
+    @if (loading()) {
+      <div class="offers-loading">
+        <i class="pi pi-spin pi-spinner"></i><span>Loading your offer catalog…</span>
+      </div>
+    } @else {
+      <div class="coupon-grid">
+        @for (promo of promos(); track promo.id) {
+          <article class="coupon-card" [class.coupon-card--inactive]="!promo.isActive">
+            <div class="coupon-card__topline"></div>
+            <div class="coupon-card__header">
+              <div class="coupon-card__discount-icon"><i [class]="discountIcon(promo)"></i></div>
+              <div class="coupon-card__discount">
+                <strong>{{ promo.discountValue }}{{ promo.discountType === 1 ? '%' : '' }}</strong
+                ><span>{{ promo.discountType === 1 ? 'OFF' : 'EGP OFF' }}</span>
+              </div>
+              <p-tag [value]="statusLabel(promo)" [severity]="statusSeverity(promo)" />
+            </div>
+
+            <div class="coupon-card__plan">
+              <i class="pi pi-bolt"></i><span>{{ promo.planName }}</span>
+            </div>
+            <button
+              type="button"
+              class="coupon-card__code"
+              (click)="copyCode(promo.code)"
+              [attr.aria-label]="'Copy ' + promo.code"
+            >
+              <strong>{{ promo.code }}</strong
+              ><span><i class="pi pi-copy"></i> Copy</span>
+            </button>
+
+            <div class="coupon-card__usage">
+              <div>
+                <span>REDEEMED</span
+                ><strong>{{ promo.usageCount }} / {{ promo.usageLimit }}</strong>
+              </div>
+              <div class="coupon-card__progress">
+                <span [style.width.%]="usagePercent(promo)"></span>
+              </div>
+            </div>
+
+            <div class="coupon-card__meta">
+              <span><i class="pi pi-users"></i>{{ audienceLabel(promo.audience) }}</span>
+              <span><i class="pi pi-calendar"></i>{{ promo.expiresAtUtc | date: 'MMM d, y' }}</span>
+              <span
+                ><i class="pi pi-wallet"></i>{{ minimumPurchaseLabel(promo.minimumPurchaseAmount) }}</span
+              >
+            </div>
+
+            <div class="coupon-card__footer">
+              <p-button
+                label="View details"
+                icon="pi pi-eye"
+                [text]="true"
+                severity="secondary"
+                (onClick)="viewDetails(promo)"
+              />
+              <p-button
+                [label]="promo.isActive ? 'Disable' : 'Activate'"
+                [icon]="promo.isActive ? 'pi pi-ban' : 'pi pi-check'"
+                [severity]="promo.isActive ? 'warn' : 'success'"
+                [outlined]="!promo.isActive"
+                [loading]="actionLoading() === promo.id"
+                (onClick)="togglePromo(promo)"
+              />
+            </div>
+          </article>
+        } @empty {
+          <div class="offers-empty">
+            <i class="pi pi-ticket"></i><strong>No coupons found</strong>
+            <span>Try a different search or create your first offer.</span>
+            <p-button
+              label="Create coupon"
+              icon="pi pi-plus"
+              [outlined]="true"
+              (onClick)="openCreate()"
+            />
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>
+
+<p-dialog
+  [(visible)]="createVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(620px, calc(100vw - 2rem))' }"
+  header="Create coupon"
+>
+  <form class="offer-form" [formGroup]="promoForm" (ngSubmit)="createPromo()">
+    <div class="offer-form__intro">
+      <div><i class="pi pi-sparkles"></i></div>
+      <span
+        ><strong>Create a clear offer</strong
+        ><small>Keep the rules simple for your team and members.</small></span
+      >
+    </div>
+
+    <div class="offer-form__grid">
+      <div class="offer-field offer-field--wide">
+        <label for="promoCode">Coupon code</label>
+        <input
+          id="promoCode"
+          pInputText
+          formControlName="code"
+          placeholder="WELCOME20"
+          autocomplete="off"
+        />
+        @if (isInvalid('code')) {
+          <p-message severity="error" [closable]="false">{{ error('code') }}</p-message>
+        }
+      </div>
+      <div class="offer-field offer-field--wide">
+        <label for="promoPlan">Plan</label>
+        <select id="promoPlan" formControlName="planId">
+          <option [ngValue]="0" disabled>
+            {{ plansLoading() ? 'Loading plans…' : 'Choose a plan' }}
+          </option>
+          @for (plan of plans(); track plan.planId) {
+            <option [ngValue]="plan.planId">{{ plan.title }} · {{ plan.cost | number }} EGP</option>
+          }
+        </select>
+        @if (isInvalid('planId')) {
+          <p-message severity="error" [closable]="false">Choose a plan.</p-message>
+        }
+      </div>
+      <div class="offer-field">
+        <label for="discountType">Discount type</label>
+        <select id="discountType" formControlName="discountType">
+          @for (type of discountTypes; track type.value) {
+            <option [ngValue]="type.value">{{ type.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="offer-field">
+        <label for="discountValue">Discount value</label>
+        <input
+          id="discountValue"
+          type="number"
+          min="0.01"
+          step="0.01"
+          pInputText
+          formControlName="discountValue"
+          [placeholder]="promoForm.controls.discountType.value === 1 ? '20' : '200'"
+        />
+        @if (isInvalid('discountValue')) {
+          <p-message severity="error" [closable]="false">{{ error('discountValue') }}</p-message>
+        }
+      </div>
+      @if (promoForm.controls.discountType.value === 1) {
+        <div class="offer-field">
+          <label for="maxDiscount">Maximum discount <span>Optional · EGP</span></label>
+          <input
+            id="maxDiscount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            pInputText
+            formControlName="maxDiscount"
+            placeholder="300"
+          />
+          @if (isInvalid('maxDiscount')) {
+            <p-message severity="error" [closable]="false">{{ error('maxDiscount') }}</p-message>
+          }
+        </div>
+      }
+      <div class="offer-field">
+        <label for="minimumPurchase">Minimum purchase<span>Optional · EGP</span></label>
+        <input
+          id="minimumPurchase"
+          type="number"
+          min="0"
+          step="0.01"
+          pInputText
+          formControlName="minimumPurchaseAmount"
+          placeholder="500"
+        />
+      </div>
+      <div class="offer-field">
+        <label for="audience">Audience</label>
+        <select id="audience" formControlName="audience">
+          @for (audience of audiences; track audience.value) {
+            <option [ngValue]="audience.value">{{ audience.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="offer-field">
+        <label for="usageLimit">Usage limit</label>
+        <input
+          id="usageLimit"
+          type="number"
+          min="1"
+          step="1"
+          pInputText
+          formControlName="usageLimit"
+          placeholder="100"
+        />
+        @if (isInvalid('usageLimit')) {
+          <p-message severity="error" [closable]="false">{{ error('usageLimit') }}</p-message>
+        }
+      </div>
+      <div class="offer-field offer-field--wide">
+        <label for="expiresAt">Expiration date</label>
+        <input id="expiresAt" type="datetime-local" pInputText formControlName="expiresAtLocal" />
+        @if (isInvalid('expiresAtLocal')) {
+          <p-message severity="error" [closable]="false">Choose an expiration date.</p-message>
+        }
+      </div>
+    </div>
+
+    <div class="offer-form__actions">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [text]="true"
+        type="button"
+        (onClick)="createVisible.set(false)"
+      />
+      <p-button label="Create coupon" icon="pi pi-check" type="submit" [loading]="saving()" />
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="detailsVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: 'min(560px, calc(100vw - 2rem))' }"
+  header="Coupon details"
+>
+  @if (selectedPromo(); as promo) {
+    <div class="offer-details">
+      <div class="offer-details__hero">
+        <div class="coupon-card__discount-icon"><i [class]="discountIcon(promo)"></i></div>
+        <div>
+          <span class="eyebrow">COUPON #{{ promo.id }}</span>
+          <h2>{{ promo.code }}</h2>
+          <span>{{ promo.planName }} · {{ discountLabel(promo) }}</span>
+        </div>
+        <p-tag [value]="statusLabel(promo)" [severity]="statusSeverity(promo)" />
+      </div>
+      <div class="offer-details__grid">
+        <div>
+          <span>Audience</span><strong>{{ audienceLabel(promo.audience) }}</strong>
+        </div>
+        <div>
+          <span>Usage</span><strong>{{ promo.usageCount }} / {{ promo.usageLimit }}</strong>
+        </div>
+        <div>
+          <span>Minimum purchase</span
+          ><strong>{{ minimumPurchaseLabel(promo.minimumPurchaseAmount) }}</strong>
+        </div>
+        <div>
+          <span>Maximum discount</span
+          ><strong>{{ maximumDiscountLabel(promo.maxDiscount) }}</strong>
+        </div>
+        <div>
+          <span>Expires</span><strong>{{ promo.expiresAtUtc | date: 'MMM d, y · h:mm a' }}</strong>
+        </div>
+        <div>
+          <span>Plan</span><strong>{{ promo.planName }}</strong>
+        </div>
+      </div>
+      <div class="offer-details__actions">
+        <p-button
+          label="Copy code"
+          icon="pi pi-copy"
+          [outlined]="true"
+          (onClick)="copyCode(promo.code)"
+        />
+        <p-button
+          [label]="promo.isActive ? 'Disable coupon' : 'Activate coupon'"
+          [icon]="promo.isActive ? 'pi pi-ban' : 'pi pi-check'"
+          [severity]="promo.isActive ? 'warn' : 'success'"
+          (onClick)="detailsVisible.set(false); togglePromo(promo)"
+        />
+      </div>
+    </div>
+  }
+</p-dialog>

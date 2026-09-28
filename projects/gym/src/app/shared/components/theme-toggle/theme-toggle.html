@@ -1,0 +1,22 @@
+<button
+  type="button"
+  class="theme-toggle"
+  [class.is-in-shell]="!embedded && inApplicationShell()"
+  [class.is-dark]="theme.isDark()"
+  [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+  [attr.title]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+  (click)="theme.toggle()"
+>
+  <span class="theme-toggle__icon" aria-hidden="true">
+    <i class="pi" [class.pi-moon]="!theme.isDark()" [class.pi-sun]="theme.isDark()"></i>
+  </span>
+
+  <span class="theme-toggle__copy">
+    <span class="theme-toggle__eyebrow">Appearance</span>
+    <span class="theme-toggle__mode">{{ theme.isDark() ? 'Dark mode' : 'Light mode' }}</span>
+  </span>
+
+  <span class="theme-toggle__track" aria-hidden="true">
+    <span class="theme-toggle__knob"></span>
+  </span>
+</button>

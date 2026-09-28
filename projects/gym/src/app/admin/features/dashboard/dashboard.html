@@ -1,0 +1,195 @@
+<div class="dashboard">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-copy">
+      <span class="eyebrow">OVERVIEW</span>
+
+      <h1>Dashboard</h1>
+
+      <p>Monitor your gym performance and activity at a glance.</p>
+    </div>
+
+    <div class="header-actions">
+      <div class="dashboard-live-chip"><span class="live-dot"></span><span>Live overview</span><i class="pi pi-bolt"></i></div>
+      <div class="dashboard-date-chip"><i class="pi pi-calendar"></i><span>Today at a glance</span></div>
+    </div>
+  </header>
+
+  <!-- KPI -->
+  <section class="stats-grid">
+    <app-stat-card
+      title="Total Members"
+      [value]="dashboardState()?.totalMembers?.toString() ?? '0'"
+      icon="pi pi-users"
+    />
+
+    <app-stat-card
+      title="Active Subscriptions"
+      [value]="dashboardState()?.activeSubscriptions?.toString() ?? '0'"
+      icon="pi pi-id-card"
+    />
+
+    <app-stat-card
+      title="Today's Revenue"
+      [value]="
+        (dashboardState()?.todayRevenue ?? 0 | currency: 'EGP' : 'symbol' : '1.0-0') ?? 'EGP 0'
+      "
+      icon="pi pi-wallet"
+    />
+
+    <app-stat-card
+      title="Today's Attendance"
+      [value]="dashboardState()?.todayAttendanceCount?.toString() ?? '0'"
+      icon="pi pi-sign-in"
+    />
+  </section>
+
+  <!-- Charts -->
+  <section class="charts-grid">
+    <app-revenue-chart [data]="dashboardState()?.revenue ?? []" />
+
+    <app-attendance-chart [data]="dashboardState()?.attendance ?? []" />
+  </section>
+
+  <!-- Analytics -->
+  <section class="analytics-grid">
+    <!-- Subscription Overview -->
+    <article class="dashboard-card subscription-card">
+      <div class="card-header">
+        <div>
+          <span class="eyebrow">MEMBERSHIP</span>
+          <h2>Subscription Overview</h2>
+        </div>
+      </div>
+
+      <div class="subscription-content">
+        <div class="subscription-highlight">
+          <div class="highlight-icon">
+            <i class="pi pi-chart-pie"></i>
+          </div>
+
+          <div>
+            <span>Active subscriptions</span>
+
+            <strong>
+              {{ dashboardState()?.activeSubscriptions ?? 0 }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="subscription-list">
+          <div class="subscription-item">
+            <div class="item-label">
+              <span class="status-dot active"></span>
+              <span>Active</span>
+            </div>
+
+            <strong>
+              {{ dashboardState()?.activeSubscriptions ?? 0 }}
+            </strong>
+          </div>
+
+          <div class="subscription-item">
+            <div class="item-label">
+              <span class="status-dot frozen"></span>
+              <span>Frozen</span>
+            </div>
+
+            <strong>
+              {{ dashboardState()?.frozenSubscriptions ?? 0 }}
+            </strong>
+          </div>
+
+          <div class="subscription-item">
+            <div class="item-label">
+              <span class="status-dot scheduled"></span>
+              <span>Scheduled</span>
+            </div>
+
+            <strong>
+              {{ dashboardState()?.scheduledSubscriptions ?? 0 }}
+            </strong>
+          </div>
+
+          <div class="subscription-item">
+            <div class="item-label">
+              <span class="status-dot expired"></span>
+              <span>Expired</span>
+            </div>
+
+            <strong>
+              {{ dashboardState()?.expiredSubscriptions ?? 0 }}
+            </strong>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Payments -->
+    <article class="dashboard-card payments-card">
+      <div class="card-header">
+        <div>
+          <span class="eyebrow">PAYMENTS</span>
+          <h2>Payment Overview</h2>
+        </div>
+      </div>
+
+      <div class="payment-grid">
+        <div class="payment-stat paid">
+          <div class="payment-icon">
+            <i class="pi pi-check-circle"></i>
+          </div>
+
+          <div>
+            <span>Paid</span>
+
+            <strong>
+              {{ dashboardState()?.paidPaymentsCount ?? 0 }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="payment-stat pending">
+          <div class="payment-icon">
+            <i class="pi pi-clock"></i>
+          </div>
+
+          <div>
+            <span>Pending</span>
+
+            <strong>
+              {{ dashboardState()?.pendingPaymentsCount ?? 0 }}
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="popular-plan">
+        <div class="plan-icon">
+          <i class="pi pi-star-fill"></i>
+        </div>
+
+        <div class="plan-content">
+          <span>Most popular plan</span>
+
+          <strong>
+            {{ dashboardState()?.mostPopularPlan || '—' }}
+          </strong>
+        </div>
+
+        <div class="plan-count">
+          <strong>
+            {{ dashboardState()?.mostPopularPlanSubscriptionsCount ?? 0 }}
+          </strong>
+
+          <span>subscriptions</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Recent Activity -->
+  <section class="recent-checkins">
+    <app-recent-check-ins [checkIns]="dashboardState()?.recentCheckIns ?? []" />
+  </section>
+</div>

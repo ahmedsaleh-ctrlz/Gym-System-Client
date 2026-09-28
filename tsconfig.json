@@ -3,6 +3,10 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": {
+      "auth": ["./dist/auth"],
+      "config": ["./dist/config"]
+    },
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
@@ -19,5 +23,25 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true
   },
-  "files": []
+  "files": [],
+  "references": [
+    {
+      "path": "./projects/gym/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/gym/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/auth/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/auth/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/config/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/config/tsconfig.spec.json"
+    }
+  ]
 }

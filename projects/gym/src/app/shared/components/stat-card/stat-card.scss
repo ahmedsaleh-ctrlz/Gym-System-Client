@@ -1,0 +1,24 @@
+.stat-card {
+  padding: 1.25rem;
+  background: var(--p-card-background);
+  color: var(--p-text-color);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 1rem;
+}
+
+.title {
+  font-size: 0.875rem;
+  color: var(--p-text-muted-color);
+}
+
+.value {
+  margin-top: 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.change {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}

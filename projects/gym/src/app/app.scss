@@ -1,0 +1,11 @@
+:root {
+  color-scheme: light;
+}
+
+:root.app-dark {
+  color-scheme: dark;
+}
+
+body {
+  transition: background-color 180ms ease, color 180ms ease;
+}
