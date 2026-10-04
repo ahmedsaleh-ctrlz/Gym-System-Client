@@ -24,6 +24,9 @@ export class MemberPaymentTable {
   canCancel(p: MemberPayment): boolean {
     return this.isPayable(p);
   }
+  statusLabel(status: string): string {
+    return status === 'UnderReview' ? 'Under Review' : status;
+  }
   methodLabel(method: string | number, p: MemberPayment): string {
     return this.isPayable(p)
       ? 'Card via Stripe'

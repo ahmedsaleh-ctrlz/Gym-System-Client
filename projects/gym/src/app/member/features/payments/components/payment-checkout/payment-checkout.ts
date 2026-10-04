@@ -17,12 +17,20 @@ import { appConfig } from 'config';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { catchError, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { MemberPayment, MemberSubscription } from '../../../../shared/models/member-area.models';
 import { PaymentService } from '../../../../../shared/services/payment.service';
 import { SubscriptionService } from '../../../../../shared/services/subscription.service';
 import { PromoCodeService } from '../../../../../shared/services/promo-code.service';
-import { PromoCodeResponse, PromoDiscountType } from '../../../../../shared/models/promo-code.models';
+import {
+  PromoCodeResponse,
+  PromoDiscountType,
+} from '../../../../../shared/models/promo-code.models';
+import {
+  PAYMENT_METHOD,
+  PAYMENT_METHOD_OPTIONS,
+  PaymentMethodValue,
+} from '../../../../../shared/models/payment.models';
 
 @Component({
   imports: [DecimalPipe, ButtonModule, DialogModule, InputTextModule],
@@ -37,6 +45,7 @@ export class MemberPaymentCheckout implements OnDestroy {
   readonly payment = input<MemberPayment | null>(null);
   readonly visible = model(false);
   readonly completed = output<MemberPayment>();
+  readonly reviewSubmitted = output<MemberPayment>();
   readonly preparingChange = output<boolean>();
   @ViewChild('cardElement') cardHost?: ElementRef<HTMLDivElement>;
   readonly preparingPayment = signal(false);
@@ -46,6 +55,17 @@ export class MemberPaymentCheckout implements OnDestroy {
   readonly promoPreview = signal<PromoCodeResponse | null>(null);
   readonly promoError = signal('');
   readonly applyingPromo = signal(false);
+  readonly submittingReview = signal(false);
+  readonly reviewAttempted = signal(false);
+  readonly reviewError = signal('');
+  readonly paymentReference = signal('');
+  readonly selectedPaymentMethod = signal<PaymentMethodValue>(PAYMENT_METHOD.Visa);
+  readonly paymentMethods = PAYMENT_METHOD_OPTIONS.filter(
+    (method) =>
+      method.value === PAYMENT_METHOD.Visa ||
+      method.value === PAYMENT_METHOD.EWallet ||
+      method.value === PAYMENT_METHOD.InstaPay,
+  );
   readonly discountAmount = computed(() => {
     const payment = this.payment(),
       promo = this.promoPreview();
@@ -61,19 +81,97 @@ export class MemberPaymentCheckout implements OnDestroy {
   );
   private readonly openEffect = effect(() => {
     const payment = this.payment();
-    if (this.visible() && payment) {
-      this.loadSubscriptionPlan(payment);
-      this.paymentError.set('');
-      this.promoCode.set('');
-      this.promoPreview.set(null);
-      this.promoError.set('');
-      this.prepareStripeIntent(null);
+    const visible = this.visible();
+
+    if (!visible) {
+      this.initializedPaymentId = null;
+      return;
     }
+
+    if (!payment) return;
+
+    if (this.initializedPaymentId === payment.paymentId) {
+      return;
+    }
+
+    this.initializedPaymentId = payment.paymentId;
+
+    this.loadSubscriptionPlan(payment);
+
+    this.paymentError.set('');
+    this.reviewError.set('');
+    this.reviewAttempted.set(false);
+    this.paymentReference.set('');
+    this.selectedPaymentMethod.set(PAYMENT_METHOD.Visa);
+    this.promoCode.set('');
+    this.promoPreview.set(null);
+    this.promoError.set('');
+
+    this.prepareStripeIntent(null);
   });
   private stripe: Stripe | null = null;
   private card: StripeCardElement | null = null;
   private clientSecret = '';
   private subscriptionPlanId: number | null = null;
+  private initializedPaymentId: number | null = null;
+  isManualPayment(): boolean {
+    return (
+      this.selectedPaymentMethod() === PAYMENT_METHOD.EWallet ||
+      this.selectedPaymentMethod() === PAYMENT_METHOD.InstaPay
+    );
+  }
+  selectPaymentMethod(method: PaymentMethodValue): void {
+    this.selectedPaymentMethod.set(method);
+    this.reviewError.set('');
+    this.reviewAttempted.set(false);
+    this.destroyCard();
+    this.clientSecret = '';
+    if (method === PAYMENT_METHOD.Visa) {
+      this.prepareStripeIntent(this.promoPreview()?.id ?? null);
+    } else {
+      this.preparingPayment.set(false);
+      this.preparingChange.emit(false);
+    }
+  }
+  setPaymentReference(event: Event): void {
+    this.paymentReference.set((event.target as HTMLInputElement).value);
+  }
+  paymentReferenceLabel(): string {
+    return this.selectedPaymentMethod() === PAYMENT_METHOD.EWallet
+      ? 'E-Wallet payment reference'
+      : 'InstaPay payment reference';
+  }
+  submitForReview(): void {
+    const payment = this.payment();
+    const reference = this.paymentReference().trim();
+    this.reviewAttempted.set(true);
+    if (!payment || !this.isManualPayment() || !reference || this.submittingReview()) return;
+
+    this.submittingReview.set(true);
+    this.reviewError.set('');
+    this.paymentService
+      .submitPaymentForReview({
+        paymentId: payment.paymentId,
+        paymentMethod: this.selectedPaymentMethod() as
+          typeof PAYMENT_METHOD.EWallet | typeof PAYMENT_METHOD.InstaPay,
+        paymentReference: reference,
+        promoCodeId: this.promoPreview()?.id ?? null,
+      })
+      .pipe(finalize(() => this.submittingReview.set(false)))
+      .subscribe({
+        next: () => {
+          this.closeCheckout();
+          this.reviewSubmitted.emit(payment);
+        },
+        error: (error) => {
+          this.reviewError.set(
+            error?.error?.detail ??
+              error?.error?.title ??
+              'Your payment could not be submitted for review. Please try again.',
+          );
+        },
+      });
+  }
   onPromoCodeInput(event: Event): void {
     this.promoCode.set((event.target as HTMLInputElement).value);
   }
@@ -101,7 +199,9 @@ export class MemberPaymentCheckout implements OnDestroy {
           this.promoPreview.set(promo);
           this.promoCode.set(promo.code || code);
           this.applyingPromo.set(false);
-          this.prepareStripeIntent(promo.id);
+          if (this.selectedPaymentMethod() === PAYMENT_METHOD.Visa) {
+            this.prepareStripeIntent(promo.id);
+          }
         },
         error: (error) => {
           this.applyingPromo.set(false);
@@ -114,7 +214,9 @@ export class MemberPaymentCheckout implements OnDestroy {
     this.promoCode.set('');
     this.promoPreview.set(null);
     this.promoError.set('');
-    if (this.visible()) this.prepareStripeIntent(null);
+    if (this.visible() && this.selectedPaymentMethod() === PAYMENT_METHOD.Visa) {
+      this.prepareStripeIntent(null);
+    }
   }
   promoDiscountLabel(promo: PromoCodeResponse): string {
     return this.isPercentagePromo(promo)
@@ -122,7 +224,14 @@ export class MemberPaymentCheckout implements OnDestroy {
       : `${promo.discountValue.toLocaleString()} EGP off`;
   }
   async payWithCard(): Promise<void> {
-    if (!this.stripe || !this.card || !this.clientSecret || this.paying()) return;
+    if (
+      this.selectedPaymentMethod() !== PAYMENT_METHOD.Visa ||
+      !this.stripe ||
+      !this.card ||
+      !this.clientSecret ||
+      this.paying()
+    )
+      return;
     this.paying.set(true);
     this.paymentError.set('');
     try {
@@ -157,13 +266,18 @@ export class MemberPaymentCheckout implements OnDestroy {
     this.promoCode.set('');
     this.promoPreview.set(null);
     this.promoError.set('');
+    this.paymentReference.set('');
+    this.reviewError.set('');
+    this.reviewAttempted.set(false);
+    this.selectedPaymentMethod.set(PAYMENT_METHOD.Visa);
   }
   ngOnDestroy(): void {
     this.destroyCard();
   }
   private prepareStripeIntent(promoCodeId: number | null): void {
     const payment = this.payment();
-    if (!payment || this.preparingPayment()) return;
+    if (!payment || this.selectedPaymentMethod() !== PAYMENT_METHOD.Visa || this.preparingPayment())
+      return;
     this.paymentError.set('');
     this.preparingPayment.set(true);
     this.preparingChange.emit(true);
@@ -173,6 +287,7 @@ export class MemberPaymentCheckout implements OnDestroy {
       next: (intent) => {
         this.preparingPayment.set(false);
         this.preparingChange.emit(false);
+        if (this.selectedPaymentMethod() !== PAYMENT_METHOD.Visa) return;
         if (!intent.clientSecret) {
           this.paymentError.set('Secure payment could not be prepared. Please try again.');
           return;
@@ -184,6 +299,7 @@ export class MemberPaymentCheckout implements OnDestroy {
       error: (error) => {
         this.preparingPayment.set(false);
         this.preparingChange.emit(false);
+        if (this.selectedPaymentMethod() !== PAYMENT_METHOD.Visa) return;
         this.paymentError.set(
           error?.error?.detail ??
             error?.error?.title ??
@@ -272,5 +388,22 @@ export class MemberPaymentCheckout implements OnDestroy {
     if (normalized.includes('expired')) return 'This promo code has expired.';
     if (normalized.includes('usagelimit')) return 'This promo code has reached its usage limit.';
     return value;
+  }
+  open(): void {
+    const payment = this.payment();
+
+    if (!payment || this.preparingPayment()) return;
+
+    this.paymentError.set('');
+    this.reviewError.set('');
+    this.reviewAttempted.set(false);
+    this.paymentReference.set('');
+    this.selectedPaymentMethod.set(PAYMENT_METHOD.Visa);
+    this.promoCode.set('');
+    this.promoPreview.set(null);
+    this.promoError.set('');
+
+    this.loadSubscriptionPlan(payment);
+    this.prepareStripeIntent(null);
   }
 }

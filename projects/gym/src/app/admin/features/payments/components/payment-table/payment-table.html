@@ -49,6 +49,8 @@
           <option value="Pending">Pending</option>
           <option value="Failed">Failed</option>
           <option value="Refunded">Refunded</option>
+          <option value="UnderReview">Under Review</option>
+          <option value="Rejected">Rejected</option>
         </select>
       </div>
       <div class="filter-field">
@@ -112,7 +114,12 @@
             ><i class="pi pi-credit-card"></i>{{ paymentMethodLabel(payment.paymentMethod) }}</span
           >
         </td>
-        <td><p-tag [value]="payment.status" [severity]="statusSeverity(payment.status)" /></td>
+        <td>
+          <p-tag
+            [value]="statusLabel(payment.status)"
+            [severity]="statusSeverity(payment.status)"
+          />
+        </td>
         <td>
           <span class="paid-date">{{
             payment.paidAtUtc ? (payment.paidAtUtc | date: 'MMM d, y · h:mm a') : 'Awaiting payment'

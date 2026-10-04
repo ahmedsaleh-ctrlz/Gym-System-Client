@@ -9,7 +9,11 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { catchError, debounceTime, distinctUntilChanged, of, Subject } from 'rxjs';
-import { Payment, PaymentFilters } from '../../../shared/models/payment.models';
+import {
+  PAYMENT_METHOD_OPTIONS,
+  Payment,
+  PaymentFilters,
+} from '../../../shared/models/payment.models';
 import { PaymentService } from '../../../shared/services/payment.service';
 import { InvoiceDialog } from '../../../shared/components/invoice-dialog/invoice-dialog';
 import { PaymentDetailsDialog } from '../../../shared/components/payment-details-dialog/payment-details-dialog';
@@ -63,13 +67,7 @@ export class Payments {
   pendingTotal = signal(0);
   refundForm = this.fb.nonNullable.group({ paymentMethod: [0, Validators.required] });
 
-  paymentMethods = [
-    { label: 'Cash', value: 0 },
-    { label: 'Visa', value: 1 },
-    { label: 'E-Wallet', value: 2 },
-    { label: 'Insta Pay', value: 3 },
-    { label: 'Fawry', value: 4 },
-  ];
+  paymentMethods = PAYMENT_METHOD_OPTIONS;
 
   constructor() {
     this.searchChanges
@@ -156,6 +154,71 @@ export class Payments {
   cancelSelectedPayment(): void {
     const payment = this.selectedPayment();
     if (payment) this.cancelPayment(payment);
+  }
+  approveSelectedPayment(): void {
+    const payment = this.selectedPayment();
+    if (payment) this.approvePayment(payment);
+  }
+  rejectSelectedPayment(): void {
+    const payment = this.selectedPayment();
+    if (payment) this.rejectPayment(payment);
+  }
+  private isUnderReview(payment: Payment): boolean {
+    return payment.status === 'UnderReview';
+  }
+  approvePayment(payment: Payment): void {
+    if (!this.isUnderReview(payment) || this.actionLoading() !== null) return;
+    this.confirmation.confirm({
+      header: 'Approve manual payment',
+      message: `Approve payment #${payment.paymentId} for ${payment.memberName}?`,
+      icon: 'pi pi-check-circle',
+      acceptLabel: 'Approve payment',
+      rejectLabel: 'Review again',
+      accept: () => {
+        this.actionLoading.set(payment.paymentId);
+        this.service.approvePayment(payment.paymentId).subscribe({
+          next: () => {
+            this.actionLoading.set(null);
+            this.detailsVisible = false;
+            this.notifySuccess(
+              'Payment approved successfully',
+              `Payment #${payment.paymentId} is now paid.`,
+            );
+            this.loadPayments();
+          },
+          error: (error) => {
+            this.actionLoading.set(null);
+            this.notifyError('Approval failed', this.apiMessage(error));
+          },
+        });
+      },
+    });
+  }
+  rejectPayment(payment: Payment): void {
+    if (!this.isUnderReview(payment) || this.actionLoading() !== null) return;
+    this.confirmation.confirm({
+      header: 'Reject manual payment',
+      message: `Reject payment #${payment.paymentId} for ${payment.memberName}?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Reject payment',
+      rejectLabel: 'Keep under review',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.actionLoading.set(payment.paymentId);
+        this.service.rejectPayment(payment.paymentId).subscribe({
+          next: () => {
+            this.actionLoading.set(null);
+            this.detailsVisible = false;
+            this.notifySuccess('Payment rejected', `Payment #${payment.paymentId} was rejected.`);
+            this.loadPayments();
+          },
+          error: (error) => {
+            this.actionLoading.set(null);
+            this.notifyError('Rejection failed', this.apiMessage(error));
+          },
+        });
+      },
+    });
   }
   openPay(payment: Payment): void {
     this.selectedPayment.set(payment);

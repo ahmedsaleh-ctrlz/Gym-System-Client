@@ -70,6 +70,7 @@
   [(visible)]="checkoutVisible"
   (preparingChange)="preparingPayment.set($event)"
   (completed)="onPaymentCompleted($event)"
+  (reviewSubmitted)="onReviewSubmitted()"
 />
 <app-payment-details-dialog
   [payment]="selectedPayment()"

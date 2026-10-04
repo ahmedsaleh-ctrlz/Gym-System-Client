@@ -152,6 +152,15 @@ export class MemberPayments {
     this.load();
   }
 
+  onReviewSubmitted(): void {
+    this.messages.add({
+      severity: 'success',
+      summary: 'Payment submitted for review',
+      detail: 'Your payment is waiting for admin verification.',
+    });
+    this.load();
+  }
+
   viewMembership(): void {
     this.successVisible.set(false);
     this.router.navigate(['/member/membership']);
@@ -196,4 +205,3 @@ export class MemberPayments {
     });
   }
 }
-

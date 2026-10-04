@@ -20,6 +20,60 @@
 .checkout-intro small {
   display: block;
 }
+.payment-method-selector {
+  display: grid;
+  gap: 0.55rem;
+}
+.payment-method-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+}
+.payment-method-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.65rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 10px;
+  background: var(--p-content-background);
+  color: var(--p-text-color);
+  font: inherit;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+.payment-method-option--selected {
+  border-color: var(--p-primary-color);
+  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--p-primary-color) 9%, transparent);
+}
+.manual-review-panel {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--p-primary-color) 24%, var(--p-content-border-color));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--p-primary-color) 5%, transparent);
+}
+.manual-review-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  color: var(--p-primary-color);
+}
+.manual-review-heading > div {
+  display: grid;
+  gap: 0.2rem;
+}
+.manual-review-heading strong {
+  font-size: 0.76rem;
+}
+.manual-review-heading small {
+  color: var(--p-text-muted-color);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
 .checkout-intro strong {
   margin-top: 0.25rem;
 }
@@ -180,6 +234,9 @@
   border-top: 1px solid var(--p-content-border-color);
 }
 @media (max-width: 560px) {
+  .payment-method-options {
+    grid-template-columns: 1fr;
+  }
   .dialog-actions p-button {
     flex: 1;
   }

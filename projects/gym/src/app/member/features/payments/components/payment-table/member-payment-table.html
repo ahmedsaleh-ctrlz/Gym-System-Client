@@ -29,7 +29,12 @@
           <strong class="amount">{{ payment.amount | number }} EGP</strong>
         </td>
         <td>{{ methodLabel(payment.paymentMethod, payment) }}</td>
-        <td><p-tag [value]="payment.status" [severity]="statusSeverity(payment.status)" /></td>
+        <td>
+          <p-tag
+            [value]="statusLabel(payment.status)"
+            [severity]="statusSeverity(payment.status)"
+          />
+        </td>
         <td>
           <div class="row-actions">
             @if (isPayable(payment)) {

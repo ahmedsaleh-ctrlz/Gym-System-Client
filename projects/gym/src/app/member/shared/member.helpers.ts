@@ -46,10 +46,12 @@ export function statusSeverity(
       return 'info';
     case 'pending':
     case 'frozen':
+    case 'underreview':
       return 'warn';
     case 'expired':
     case 'failed':
     case 'cancelled':
+    case 'rejected':
       return 'danger';
     default:
       return 'secondary';

@@ -8,6 +8,7 @@ import {
   PaymentFilters,
   PayPaymentRequest,
   RefundPaymentRequest,
+  SubmitPaymentForReviewRequest,
   StripePaymentIntentResult,
 } from '../models/payment.models';
 
@@ -59,5 +60,17 @@ export class PaymentService {
   }
   cancel(paymentId: number): Observable<void> {
     return this.http.put<void>(`${this.url}/Cancel`, { paymentId });
+  }
+
+  submitPaymentForReview(request: SubmitPaymentForReviewRequest): Observable<void> {
+    return this.http.post<void>(`${this.url}/SubmitForReview`, request);
+  }
+
+  approvePayment(paymentId: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/${paymentId}/Approve`, null);
+  }
+
+  rejectPayment(paymentId: number): Observable<void> {
+    return this.http.post<void>(`${this.url}/${paymentId}/Reject`, null);
   }
 }

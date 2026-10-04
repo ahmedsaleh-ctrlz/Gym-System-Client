@@ -11,7 +11,11 @@ import { PaymentService } from '../../../../../shared/services/payment.service';
 import { PromoCodeService } from '../../../../../shared/services/promo-code.service';
 import { SubscriptionService } from '../../../../../shared/services/subscription.service';
 import { Subscription } from '../../../../../shared/models/subscription.models';
-import { PromoCodeResponse, PromoDiscountType } from '../../../../../shared/models/promo-code.models';
+import {
+  PromoCodeResponse,
+  PromoDiscountType,
+} from '../../../../../shared/models/promo-code.models';
+import { PAYMENT_METHOD_OPTIONS } from '../../../../../shared/models/payment.models';
 
 @Component({
   imports: [Dialog, ReactiveFormsModule, DecimalPipe, Button],
@@ -38,13 +42,7 @@ export class PayPayment {
   readonly promoPreview = signal<PromoCodeResponse | null>(null);
   readonly promoError = signal<string | null>(null);
 
-  readonly paymentMethods = [
-    { label: 'Cash', value: 0 },
-    { label: 'Visa', value: 1 },
-    { label: 'E-Wallet', value: 2 },
-    { label: 'Insta Pay', value: 3 },
-    { label: 'Fawry', value: 4 },
-  ];
+  readonly paymentMethods = PAYMENT_METHOD_OPTIONS;
 
   readonly payForm = this.fb.nonNullable.group({
     paymentMethod: [0, Validators.required],
@@ -79,11 +77,12 @@ export class PayPayment {
         this.selectedPayment.set(payment);
         this.loadSubscriptionPlan(payment);
       },
-      error: (error) => this.messages.add({
-        severity: 'error',
-        summary: 'Could not load payment',
-        detail: this.apiMessage(error),
-      }),
+      error: (error) =>
+        this.messages.add({
+          severity: 'error',
+          summary: 'Could not load payment',
+          detail: this.apiMessage(error),
+        }),
     });
   }
 
@@ -118,11 +117,12 @@ export class PayPayment {
           });
           this.completed.emit();
         },
-        error: (error) => this.messages.add({
-          severity: 'error',
-          summary: 'Payment failed',
-          detail: this.apiMessage(error),
-        }),
+        error: (error) =>
+          this.messages.add({
+            severity: 'error',
+            summary: 'Payment failed',
+            detail: this.apiMessage(error),
+          }),
       });
   }
 
@@ -139,7 +139,9 @@ export class PayPayment {
       return;
     }
     if (!this.subscriptionPlanId()) {
-      this.promoError.set('This payment is missing its plan information. Please refresh and try again.');
+      this.promoError.set(
+        'This payment is missing its plan information. Please refresh and try again.',
+      );
       return;
     }
 
@@ -168,7 +170,8 @@ export class PayPayment {
 
           this.promoPreview.set(promo);
         },
-        error: (error) => this.promoError.set(this.apiMessage(error, 'Promo code could not be applied.')),
+        error: (error) =>
+          this.promoError.set(this.apiMessage(error, 'Promo code could not be applied.')),
       });
   }
 
@@ -249,34 +252,53 @@ export class PayPayment {
 
   private loadSubscriptionPlan(payment: Payment): void {
     forkJoin({
-      current: this.subscriptionService.getMemberSubscription(payment.memberId).pipe(catchError(() => of(null))),
-      history: this.subscriptionService.getMemberHistory(payment.memberId).pipe(catchError(() => of([] as Subscription[]))),
+      current: this.subscriptionService
+        .getMemberSubscription(payment.memberId)
+        .pipe(catchError(() => of(null))),
+      history: this.subscriptionService
+        .getMemberHistory(payment.memberId)
+        .pipe(catchError(() => of([] as Subscription[]))),
     }).subscribe(({ current, history }) => {
       const subscriptions = current ? [current, ...history] : history;
-      const subscription = subscriptions.find((item) => item.subscriptionId === payment.subscriptionId);
+      const subscription = subscriptions.find(
+        (item) => item.subscriptionId === payment.subscriptionId,
+      );
       this.subscriptionPlanId.set(subscription?.planId ?? null);
     });
   }
 
   private isPercentagePromo(promo: PromoCodeResponse): boolean {
-    return promo.discountType === PromoDiscountType.Percentage ||
-      String(promo.discountType).toLowerCase() === 'percentage';
+    return (
+      promo.discountType === PromoDiscountType.Percentage ||
+      String(promo.discountType).toLowerCase() === 'percentage'
+    );
   }
 
-  private apiMessage(error: unknown, fallback = 'Please review the server response and try again.'): string {
+  private apiMessage(
+    error: unknown,
+    fallback = 'Please review the server response and try again.',
+  ): string {
     const response = error as {
-      error?: {
-        title?: string;
-        detail?: string;
-        message?: string;
-        code?: string;
-        errorCode?: string;
-      } | string;
+      error?:
+        | {
+            title?: string;
+            detail?: string;
+            message?: string;
+            code?: string;
+            errorCode?: string;
+          }
+        | string;
       message?: string;
     };
     const payload = response?.error;
     if (typeof payload === 'string') return this.friendlyPromoError(payload);
-    const raw = payload?.detail ?? payload?.message ?? payload?.code ?? payload?.errorCode ?? payload?.title ?? response?.message;
+    const raw =
+      payload?.detail ??
+      payload?.message ??
+      payload?.code ??
+      payload?.errorCode ??
+      payload?.title ??
+      response?.message;
     return raw ? this.friendlyPromoError(raw) : fallback;
   }
 

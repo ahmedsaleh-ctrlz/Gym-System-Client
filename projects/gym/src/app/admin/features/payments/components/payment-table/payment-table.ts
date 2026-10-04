@@ -5,12 +5,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { Payment } from '../../../../../shared/models/payment.models';
-
-export interface PaymentMethodOption {
-  label: string;
-  value: number;
-}
+import { Payment, PaymentMethodOption } from '../../../../../shared/models/payment.models';
 @Component({
   imports: [
     DatePipe,
@@ -36,7 +31,7 @@ export class AdminPaymentTable {
   readonly paymentMethodFilter = input<number | null>(null);
   readonly sortDirection = input<'asc' | 'desc'>('desc');
   readonly filtersVisible = input(false);
-  readonly paymentMethods = input.required<PaymentMethodOption[]>();
+  readonly paymentMethods = input.required<ReadonlyArray<PaymentMethodOption>>();
   readonly search = output<string>();
   readonly sort = output<void>();
   readonly toggleFilters = output<void>();
@@ -60,13 +55,21 @@ export class AdminPaymentTable {
     this.filterMethod.emit(value === '' ? null : Number(value));
   }
   statusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
-    return status === 'Paid'
-      ? 'success'
-      : status === 'Pending'
-        ? 'warn'
-        : status === 'Refunded'
-          ? 'info'
-          : 'danger';
+    switch (status) {
+      case 'Paid':
+        return 'success';
+      case 'Pending':
+      case 'UnderReview':
+        return 'warn';
+      case 'Refunded':
+        return 'info';
+      case 'Rejected':
+      case 'Cancelled':
+      case 'Failed':
+        return 'danger';
+      default:
+        return 'secondary';
+    }
   }
   paymentMethodLabel(method: string | number): string {
     if (typeof method === 'number')
@@ -74,5 +77,8 @@ export class AdminPaymentTable {
         this.paymentMethods().find((item) => item.value === method)?.label ?? `Method ${method}`
       );
     return method || 'Not recorded';
+  }
+  statusLabel(status: string): string {
+    return status === 'UnderReview' ? 'Under Review' : status;
   }
 }

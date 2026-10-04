@@ -80,6 +80,30 @@
 .detail-actions p-button {
   flex: 1;
 }
+.review-status-panel {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 11px;
+  color: var(--p-orange-600);
+  background: color-mix(in srgb, var(--p-orange-500) 10%, transparent);
+}
+.review-status-panel > div {
+  display: grid;
+  gap: 0.2rem;
+}
+.review-status-panel strong {
+  font-size: 0.75rem;
+}
+.review-status-panel span {
+  color: var(--p-text-muted-color);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+.review-actions {
+  margin-top: 0.2rem;
+}
 @media (max-width: 520px) {
   .payment-detail-hero {
     align-items: flex-start;

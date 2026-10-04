@@ -16,10 +16,12 @@
           <span class="eyebrow">PAYMENT #{{ payment.paymentId }}</span>
           <h2>{{ memberMode() ? payment.planName : (payment.amount | number) + ' EGP' }}</h2>
           <span>{{
-            memberMode() ? payment.status : payment.memberName + ' · ' + payment.planName
+            memberMode()
+              ? statusLabel(payment.status)
+              : payment.memberName + ' · ' + payment.planName
           }}</span>
         </div>
-        <p-tag [value]="payment.status" [severity]="statusSeverity(payment.status)" />
+        <p-tag [value]="statusLabel(payment.status)" [severity]="statusSeverity(payment.status)" />
       </div>
       @if (memberMode()) {
         <div class="member-detail-amount">
@@ -37,7 +39,7 @@
           <span>Payment method</span
           ><strong>{{ paymentMethodLabel(payment.paymentMethod, payment) }}</strong>
         </div>
-        @if (!memberMode() && hasPaymentReference(payment)) {
+        @if (hasPaymentReference(payment)) {
           <div>
             <span>Payment reference</span
             ><strong>{{ payment.paymentReference || 'Not provided' }}</strong>
@@ -67,6 +69,36 @@
             />
           }
         </div>
+      }
+      @if (isUnderReview(payment)) {
+        <div class="review-status-panel">
+          <i class="pi pi-clock"></i>
+          <div>
+            <strong>Under Review</strong>
+            <span>{{
+              memberMode()
+                ? 'Your payment is waiting for admin verification.'
+                : 'This manual payment is waiting for verification.'
+            }}</span>
+          </div>
+        </div>
+        @if (!memberMode()) {
+          <div class="detail-actions review-actions">
+            <p-button
+              label="Approve"
+              icon="pi pi-check"
+              severity="success"
+              (onClick)="approve.emit(); visible.set(false)"
+            />
+            <p-button
+              label="Reject"
+              icon="pi pi-times"
+              severity="danger"
+              [outlined]="true"
+              (onClick)="reject.emit(); visible.set(false)"
+            />
+          </div>
+        }
       }
       @if (!memberMode() && isPending(payment)) {
         <div class="detail-actions">

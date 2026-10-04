@@ -4,7 +4,7 @@
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(520px, calc(100vw - 2rem))' }"
-  header="Secure card payment"
+  header="Complete payment"
   (onHide)="closeCheckout()"
 >
   @if (payment(); as payment) {
@@ -12,8 +12,31 @@
       <div class="checkout-intro">
         <span class="checkout-icon"><i class="pi pi-lock"></i></span>
         <div>
-          <span class="eyebrow">SECURE PAYMENT</span><strong>{{ payment.planName }}</strong
-          ><small>Visa and card payments are securely processed by Stripe.</small>
+          <span class="eyebrow">PAYMENT OPTIONS</span><strong>{{ payment.planName }}</strong>
+          @if (isManualPayment()) {
+            <small
+              >Submit your E-Wallet or InstaPay reference for administrator verification.</small
+            >
+          } @else {
+            <small>Visa and card payments are securely processed by Stripe.</small>
+          }
+        </div>
+      </div>
+      <div class="payment-method-selector">
+        <span class="card-label">Payment method</span>
+        <div class="payment-method-options" role="radiogroup" aria-label="Payment method">
+          @for (method of paymentMethods; track method.value) {
+            <button
+              type="button"
+              class="payment-method-option"
+              [class.payment-method-option--selected]="selectedPaymentMethod() === method.value"
+              [attr.aria-checked]="selectedPaymentMethod() === method.value"
+              role="radio"
+              (click)="selectPaymentMethod(method.value)"
+            >
+              <i class="pi pi-credit-card"></i><span>{{ method.label }}</span>
+            </button>
+          }
         </div>
       </div>
       <div class="checkout-amount">
@@ -78,7 +101,37 @@
           <small class="promo-error"><i class="pi pi-info-circle"></i>{{ promoError() }}</small>
         }
       </div>
-      @if (paymentError()) {
+      @if (isManualPayment()) {
+        <div class="manual-review-panel">
+          <div class="manual-review-heading">
+            <i class="pi pi-file-edit"></i>
+            <div>
+              <strong>Submit payment for review</strong>
+              <small>Your payment reference is required for administrator verification.</small>
+            </div>
+          </div>
+          <label class="card-label" for="paymentReference">{{ paymentReferenceLabel() }}</label>
+          <input
+            id="paymentReference"
+            pInputText
+            type="text"
+            [value]="paymentReference()"
+            [placeholder]="'Enter your ' + paymentReferenceLabel().toLowerCase()"
+            autocomplete="off"
+            (input)="setPaymentReference($event)"
+          />
+          @if (reviewAttempted() && !paymentReference().trim()) {
+            <small class="promo-error"
+              ><i class="pi pi-exclamation-circle"></i>Payment reference is required.</small
+            >
+          }
+          @if (reviewError()) {
+            <small class="promo-error"
+              ><i class="pi pi-exclamation-circle"></i>{{ reviewError() }}</small
+            >
+          }
+        </div>
+      } @else if (paymentError()) {
         <div class="payment-error">
           <i class="pi pi-exclamation-circle"></i><span>{{ paymentError() }}</span>
         </div>
@@ -94,18 +147,24 @@
         >
       }
       <div class="dialog-actions">
-        <p-button
-          label="Cancel"
-          [text]="true"
-          severity="secondary"
-          (onClick)="closeCheckout()"
-        /><p-button
-          label="Pay securely"
-          icon="pi pi-lock"
-          [loading]="paying()"
-          [disabled]="!!paymentError() || preparingPayment() || applyingPromo()"
-          (onClick)="payWithCard()"
-        />
+        <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="closeCheckout()" />
+        @if (isManualPayment()) {
+          <p-button
+            label="Submit for Review"
+            icon="pi pi-send"
+            [loading]="submittingReview()"
+            [disabled]="submittingReview() || applyingPromo()"
+            (onClick)="submitForReview()"
+          />
+        } @else {
+          <p-button
+            label="Pay securely"
+            icon="pi pi-lock"
+            [loading]="paying()"
+            [disabled]="!!paymentError() || preparingPayment() || applyingPromo()"
+            (onClick)="payWithCard()"
+          />
+        }
       </div>
     </div>
   }
