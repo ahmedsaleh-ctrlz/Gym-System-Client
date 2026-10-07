@@ -47,7 +47,7 @@ export interface PaymentFilters {
 
 export interface PayPaymentRequest {
   paymentId: number;
-  paymentMethod: number;
+  paymentMethod: number | null;
   paymentReference: string | null;
   promoCodeId: number | null;
 }

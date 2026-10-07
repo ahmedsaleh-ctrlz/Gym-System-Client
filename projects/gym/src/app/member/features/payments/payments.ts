@@ -48,6 +48,7 @@ export class MemberPayments {
   readonly invoicePaymentId = signal<number | null>(null);
   readonly checkoutVisible = signal(false);
   readonly successVisible = signal(false);
+  readonly successfulPaymentWasFree = signal(false);
   readonly selectedPayment = signal<MemberPayment | null>(null);
   readonly successfulPayment = signal<MemberPayment | null>(null);
   readonly pendingPayments = computed(() =>
@@ -142,12 +143,23 @@ export class MemberPayments {
   }
 
   onPaymentCompleted(payment: MemberPayment): void {
+    this.showCompletion(payment, false);
+  }
+
+  onFreePaymentCompleted(payment: MemberPayment): void {
+    this.showCompletion(payment, true);
+  }
+
+  private showCompletion(payment: MemberPayment, wasFree: boolean): void {
     this.successfulPayment.set(payment);
+    this.successfulPaymentWasFree.set(wasFree);
     this.successVisible.set(true);
     this.messages.add({
       severity: 'success',
-      summary: 'Payment submitted',
-      detail: 'Your membership will be updated automatically.',
+      summary: wasFree ? 'Membership activated for free' : 'Payment submitted',
+      detail: wasFree
+        ? 'Your promo code covered the full cost. No payment method was needed.'
+        : 'Your membership will be updated automatically.',
     });
     this.load();
   }

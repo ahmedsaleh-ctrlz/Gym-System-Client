@@ -70,6 +70,7 @@
   [(visible)]="checkoutVisible"
   (preparingChange)="preparingPayment.set($event)"
   (completed)="onPaymentCompleted($event)"
+  (freeCompleted)="onFreePaymentCompleted($event)"
   (reviewSubmitted)="onReviewSubmitted()"
 />
 <app-payment-details-dialog
@@ -80,6 +81,7 @@
 />
 <app-member-payment-success
   [payment]="successfulPayment()"
+  [free]="successfulPaymentWasFree()"
   [(visible)]="successVisible"
   (viewPayment)="viewSuccessfulPayment()"
   (viewMembership)="viewMembership()"

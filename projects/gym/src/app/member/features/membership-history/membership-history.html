@@ -1,26 +1,49 @@
 @if (loading()) {
-  <section class="page-loading" role="status" aria-live="polite">
-    <span class="page-spinner"></span>
-    <strong>Opening your membership story</strong>
-    <small>Gathering your previous plans and milestones…</small>
-  </section>
-} @else {
-  <div class="history-page">
-    <header class="page-heading"><div><span class="eyebrow">YOUR JOURNEY</span><h1>Membership history</h1><p>Every chapter of your gym journey, beautifully kept.</p></div></header>
-    @if (history().length) {
-      <section class="timeline">
-        @for (item of history(); track item.subscriptionId; let last = $last) {
-          <article class="timeline-item" [class.is-last]="last">
-            <div class="timeline-marker"><i class="pi pi-check"></i></div>
-            <div class="timeline-card">
-              <div class="timeline-top"><div><span class="eyebrow">{{ item.startDate | date: 'MMM y' }} MEMBERSHIP</span><h2>{{ item.planName }}</h2></div><p-tag [value]="item.status" [severity]="statusSeverity(item.status)" /></div>
-              <div class="timeline-details"><span><i class="pi pi-calendar"></i> {{ item.startDate | date: 'MMM d, y' }} → {{ item.endDate | date: 'MMM d, y' }}</span><strong>{{ item.price | number }} EGP</strong><span><i class="pi pi-snowflake"></i> {{ item.freezeCountUsed }} freezes · {{ item.totalFreezeDaysUsed }} days used</span></div>
-            </div>
-          </article>
-        }
-      </section>
-    } @else {
-      <section class="empty-history"><i class="pi pi-history"></i><h2>Your membership history will appear here.</h2><p>Once you start a membership, every milestone will be easy to revisit.</p></section>
-    }
-  </div>
+<section class="page-loading" role="status" aria-live="polite">
+  <span class="page-spinner"></span>
+  <strong>Opening your membership story</strong>
+  <small>Gathering your previous plans and milestones…</small>
+</section>
 }
+@else {
+<div class="history-page">
+  <header class="page-heading">
+    <div>
+      <span class="eyebrow">YOUR JOURNEY</span>
+      <h1>Membership history</h1>
+      <p>Every chapter of your gym journey, beautifully kept.</p>
+    </div>
+
+    <button type="button" class="show-all-btn" (click)="toggleShowAll()">
+      <i class="pi" [class.pi-list]="!showAll()" [class.pi-history]="showAll()"></i>
+      {{ showAll() ? 'Show Active' : 'Show All' }}
+    </button>
+  </header>
+  @if (activeTimeLineHistory().length) {
+  <section class="timeline">
+    @for (item of activeTimeLineHistory(); track item.subscriptionId; let last = $last) {
+    <article class="timeline-item" [class.is-last]="last">
+      <div class="timeline-marker"><i class="pi pi-check"></i></div>
+      <div class="timeline-card">
+        <div class="timeline-top">
+          <div><span class="eyebrow">{{ item.startDate | date: 'MMM y' }} MEMBERSHIP</span>
+            <h2>{{ item.planName }}</h2>
+          </div><p-tag [value]="item.status" [severity]="statusSeverity(item.status)" />
+        </div>
+        <div class="timeline-details"><span><i class="pi pi-calendar"></i> {{ item.startDate | date: 'MMM d, y' }} → {{
+            item.endDate | date: 'MMM d, y' }}</span><strong>{{ item.price | number }} EGP</strong><span><i
+              class="pi pi-snowflake"></i> {{ item.freezeCountUsed }} freezes · {{ item.totalFreezeDaysUsed }} days
+            used</span></div>
+      </div>
+    </article>
+  }
+  </section>
+  } @else {
+  <section class="empty-history"><i class="pi pi-history"></i>
+    <h2>Your membership history will appear here.</h2>
+    <p>Once you start a membership, every milestone will be easy to revisit.</p>
+  </section>
+  }
+</div>
+}
+

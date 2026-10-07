@@ -5,15 +5,23 @@
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(500px, calc(100vw - 2rem))' }"
-  header="Payment successful"
+  [header]="free() ? 'Membership activated' : 'Payment successful'"
 >
   @if (payment(); as payment) {
     <div class="success-state">
       <div class="success-icon"><i class="pi pi-check"></i></div>
-      <span class="eyebrow">PAYMENT SUCCESSFUL 🎉</span>
-      <h2>Your payment is complete.</h2>
-      <p>{{ payment.planName }} · {{ payment.amount | number }} EGP</p>
-      <small>Your membership will be updated automatically by the backend.</small>
+      <span class="eyebrow">{{
+        free() ? 'MEMBERSHIP ACTIVATED 🎉' : 'PAYMENT SUCCESSFUL 🎉'
+      }}</span>
+      <h2>
+        {{ free() ? 'Your promo code made this membership free.' : 'Your payment is complete.' }}
+      </h2>
+      <p>{{ payment.planName }} · {{ free() ? 0 : (payment.amount | number) }} EGP</p>
+      <small>{{
+        free()
+          ? 'No payment method was needed. Your membership will be updated automatically.'
+          : 'Your membership will be updated automatically by the backend.'
+      }}</small>
       <div class="dialog-actions">
         <p-button
           label="View payment"

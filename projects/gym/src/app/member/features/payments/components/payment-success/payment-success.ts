@@ -11,6 +11,7 @@ import { MemberPayment } from '../../../../shared/models/member-area.models';
 })
 export class MemberPaymentSuccess {
   readonly payment = input<MemberPayment | null>(null);
+  readonly free = input(false);
   readonly visible = model(false);
   readonly viewPayment = output<void>();
   readonly viewMembership = output<void>();

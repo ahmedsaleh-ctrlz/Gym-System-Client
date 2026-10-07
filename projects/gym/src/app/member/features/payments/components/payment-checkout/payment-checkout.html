@@ -4,7 +4,7 @@
   [draggable]="false"
   [resizable]="false"
   [style]="{ width: 'min(520px, calc(100vw - 2rem))' }"
-  header="Complete payment"
+  [header]="isFreeCheckout() ? 'Activate your free membership' : 'Complete payment'"
   (onHide)="closeCheckout()"
 >
   @if (payment(); as payment) {
@@ -13,7 +13,9 @@
         <span class="checkout-icon"><i class="pi pi-lock"></i></span>
         <div>
           <span class="eyebrow">PAYMENT OPTIONS</span><strong>{{ payment.planName }}</strong>
-          @if (isManualPayment()) {
+          @if (isFreeCheckout()) {
+            <small>Your promo code covers the full cost. No payment method is needed.</small>
+          } @else if (isManualPayment()) {
             <small
               >Submit your E-Wallet or InstaPay reference for administrator verification.</small
             >
@@ -22,23 +24,25 @@
           }
         </div>
       </div>
-      <div class="payment-method-selector">
-        <span class="card-label">Payment method</span>
-        <div class="payment-method-options" role="radiogroup" aria-label="Payment method">
-          @for (method of paymentMethods; track method.value) {
-            <button
-              type="button"
-              class="payment-method-option"
-              [class.payment-method-option--selected]="selectedPaymentMethod() === method.value"
-              [attr.aria-checked]="selectedPaymentMethod() === method.value"
-              role="radio"
-              (click)="selectPaymentMethod(method.value)"
-            >
-              <i class="pi pi-credit-card"></i><span>{{ method.label }}</span>
-            </button>
-          }
+      @if (!isFreeCheckout()) {
+        <div class="payment-method-selector">
+          <span class="card-label">Payment method</span>
+          <div class="payment-method-options" role="radiogroup" aria-label="Payment method">
+            @for (method of paymentMethods; track method.value) {
+              <button
+                type="button"
+                class="payment-method-option"
+                [class.payment-method-option--selected]="selectedPaymentMethod() === method.value"
+                [attr.aria-checked]="selectedPaymentMethod() === method.value"
+                role="radio"
+                (click)="selectPaymentMethod(method.value)"
+              >
+                <i class="pi pi-credit-card"></i><span>{{ method.label }}</span>
+              </button>
+            }
+          </div>
         </div>
-      </div>
+      }
       <div class="checkout-amount">
         <div class="checkout-price-label"><span>Total due</span><span>EGP</span></div>
         @if (promoPreview(); as promo) {
@@ -101,7 +105,23 @@
           <small class="promo-error"><i class="pi pi-info-circle"></i>{{ promoError() }}</small>
         }
       </div>
-      @if (isManualPayment()) {
+      @if (isFreeCheckout()) {
+        <div class="free-checkout-panel" role="status">
+          <span class="free-checkout-icon"><i class="pi pi-gift"></i></span>
+          <div>
+            <strong>This membership is free</strong>
+            <small
+              >Your promo code has reduced the total to 0 EGP. Activate it without a payment
+              method.</small
+            >
+          </div>
+        </div>
+        @if (paymentError()) {
+          <div class="payment-error">
+            <i class="pi pi-exclamation-circle"></i><span>{{ paymentError() }}</span>
+          </div>
+        }
+      } @else if (isManualPayment()) {
         <div class="manual-review-panel">
           <div class="manual-review-heading">
             <i class="pi pi-file-edit"></i>
@@ -148,7 +168,15 @@
       }
       <div class="dialog-actions">
         <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="closeCheckout()" />
-        @if (isManualPayment()) {
+        @if (isFreeCheckout()) {
+          <p-button
+            label="Activate for free"
+            icon="pi pi-gift"
+            [loading]="paying()"
+            [disabled]="paying() || applyingPromo()"
+            (onClick)="completeFreePayment()"
+          />
+        } @else if (isManualPayment()) {
           <p-button
             label="Submit for Review"
             icon="pi pi-send"

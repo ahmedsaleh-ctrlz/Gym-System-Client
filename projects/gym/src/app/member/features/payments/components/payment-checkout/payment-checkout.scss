@@ -56,6 +56,37 @@
   border-radius: 12px;
   background: color-mix(in srgb, var(--p-primary-color) 5%, transparent);
 }
+.free-checkout-panel {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--p-green-500) 32%, var(--p-content-border-color));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--p-green-500) 7%, transparent);
+}
+.free-checkout-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--p-green-500);
+  background: color-mix(in srgb, var(--p-green-500) 14%, transparent);
+}
+.free-checkout-panel div {
+  display: grid;
+  gap: 0.2rem;
+}
+.free-checkout-panel strong {
+  font-size: 0.76rem;
+}
+.free-checkout-panel small {
+  color: var(--p-text-muted-color);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
 .manual-review-heading {
   display: flex;
   align-items: flex-start;

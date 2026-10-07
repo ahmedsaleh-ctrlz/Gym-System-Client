@@ -45,6 +45,7 @@ export class MemberPaymentCheckout implements OnDestroy {
   readonly payment = input<MemberPayment | null>(null);
   readonly visible = model(false);
   readonly completed = output<MemberPayment>();
+  readonly freeCompleted = output<MemberPayment>();
   readonly reviewSubmitted = output<MemberPayment>();
   readonly preparingChange = output<boolean>();
   @ViewChild('cardElement') cardHost?: ElementRef<HTMLDivElement>;
@@ -78,6 +79,9 @@ export class MemberPaymentCheckout implements OnDestroy {
   });
   readonly finalAmount = computed(() =>
     Math.max(0, (this.payment()?.amount ?? 0) - this.discountAmount()),
+  );
+  readonly isFreeCheckout = computed(
+    () => this.promoPreview() !== null && this.finalAmount() === 0,
   );
   private readonly openEffect = effect(() => {
     const payment = this.payment();
@@ -121,6 +125,7 @@ export class MemberPaymentCheckout implements OnDestroy {
     );
   }
   selectPaymentMethod(method: PaymentMethodValue): void {
+    if (this.isFreeCheckout()) return;
     this.selectedPaymentMethod.set(method);
     this.reviewError.set('');
     this.reviewAttempted.set(false);
@@ -199,7 +204,13 @@ export class MemberPaymentCheckout implements OnDestroy {
           this.promoPreview.set(promo);
           this.promoCode.set(promo.code || code);
           this.applyingPromo.set(false);
-          if (this.selectedPaymentMethod() === PAYMENT_METHOD.Visa) {
+          if (this.isFreeCheckout()) {
+            this.paymentError.set('');
+            this.destroyCard();
+            this.clientSecret = '';
+            this.preparingPayment.set(false);
+            this.preparingChange.emit(false);
+          } else if (this.selectedPaymentMethod() === PAYMENT_METHOD.Visa) {
             this.prepareStripeIntent(promo.id);
           }
         },
@@ -222,6 +233,35 @@ export class MemberPaymentCheckout implements OnDestroy {
     return this.isPercentagePromo(promo)
       ? `${promo.discountValue}% off`
       : `${promo.discountValue.toLocaleString()} EGP off`;
+  }
+  completeFreePayment(): void {
+    const payment = this.payment();
+    const promo = this.promoPreview();
+    if (!payment || !promo || !this.isFreeCheckout() || this.paying()) return;
+
+    this.paying.set(true);
+    this.paymentError.set('');
+    this.paymentService
+      .pay({
+        paymentId: payment.paymentId,
+        paymentMethod: null,
+        paymentReference: null,
+        promoCodeId: promo.id,
+      })
+      .pipe(finalize(() => this.paying.set(false)))
+      .subscribe({
+        next: () => {
+          this.closeCheckout();
+          this.freeCompleted.emit(payment);
+        },
+        error: (error) => {
+          this.paymentError.set(
+            error?.error?.detail ??
+              error?.error?.title ??
+              'Your free membership could not be activated. Please try again.',
+          );
+        },
+      });
   }
   async payWithCard(): Promise<void> {
     if (

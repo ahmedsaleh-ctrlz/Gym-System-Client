@@ -80,6 +80,7 @@ export class SubscriptionService {
   getMemberHistory(memberId: number): Observable<Subscription[]> {
     return this.http.get<Subscription[]>(`${this.url}/member/${memberId}/history`);
   }
+
   getHistory(memberId: number): Observable<Subscription[]> {
     return this.getMemberHistory(memberId);
   }
