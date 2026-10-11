@@ -13,25 +13,20 @@
   </header>
 
   @if (pendingPayments()[0]; as pending) {
-    <section class="pending-payment" aria-live="polite">
-      <div class="pending-copy">
-        <span class="pending-icon"><i class="pi pi-credit-card"></i></span>
-        <div>
-          <span class="eyebrow">PAYMENT REQUIRED</span>
-          <h2>{{ pending.planName }} is waiting for you.</h2>
-          <p>Complete this payment to activate your membership.</p>
-        </div>
+  <section class="pending-payment" aria-live="polite">
+    <div class="pending-copy">
+      <span class="pending-icon"><i class="pi pi-credit-card"></i></span>
+      <div>
+        <span class="eyebrow">PAYMENT REQUIRED</span>
+        <h2>{{ pending.planName }} is waiting for you.</h2>
+        <p>Complete this payment to activate your membership.</p>
       </div>
-      <div class="pending-action">
-        <strong>{{ pending.amount | number }} <small>EGP</small></strong
-        ><p-button
-          label="Pay with Visa"
-          icon="pi pi-lock"
-          [loading]="preparingPayment()"
-          (onClick)="preparePayment(pending)"
-        />
-      </div>
-    </section>
+    </div>
+    <div class="pending-action">
+      <strong>{{ pending.amount | number }} <small>EGP</small></strong><p-button label="Pay with Visa" icon="pi pi-lock"
+        [loading]="preparingPayment()" (onClick)="preparePayment(pending)" />
+    </div>
+  </section>
   }
 
   <section class="payment-summary">
@@ -46,46 +41,21 @@
     <i class="pi pi-shield"></i>
   </section>
 
-  <app-member-payment-table
-    [payments]="payments()"
-    [loading]="loading()"
-    [preparingPaymentId]="preparingPayment() ? (selectedPayment()?.paymentId ?? null) : null"
-    (view)="view($event)"
-    (pay)="preparePayment($event)"
-    (cancel)="cancel($event)"
-  >
-    <p-button
-      tableActions
-      icon="pi pi-refresh"
-      [text]="true"
-      severity="secondary"
-      ariaLabel="Refresh payments"
-      (onClick)="load()"
-    />
+  <app-member-payment-table [payments]="payments()" [loading]="loading()"
+    [preparingPaymentId]="preparingPayment() ? (selectedPayment()?.paymentId ?? null) : null" (view)="view($event)"
+    (pay)="preparePayment($event)" (cancel)="cancel($event)">
+    <p-button tableActions icon="pi pi-refresh" [text]="true" severity="secondary" ariaLabel="Refresh payments"
+      (onClick)="load()" />
   </app-member-payment-table>
 </div>
 
-<app-member-payment-checkout
-  [payment]="selectedPayment()"
-  [(visible)]="checkoutVisible"
-  (preparingChange)="preparingPayment.set($event)"
-  (completed)="onPaymentCompleted($event)"
-  (freeCompleted)="onFreePaymentCompleted($event)"
-  (reviewSubmitted)="onReviewSubmitted()"
-/>
-<app-payment-details-dialog
-  [payment]="selectedPayment()"
-  [memberMode]="true"
-  [(visible)]="detailsVisible"
-  (viewInvoice)="viewSelectedInvoice()"
-/>
-<app-member-payment-success
-  [payment]="successfulPayment()"
-  [free]="successfulPaymentWasFree()"
-  [(visible)]="successVisible"
-  (viewPayment)="viewSuccessfulPayment()"
-  (viewMembership)="viewMembership()"
-/>
+<app-member-payment-checkout [payment]="selectedPayment()" [(visible)]="checkoutVisible"
+  (preparingChange)="preparingPayment.set($event)" (completed)="onPaymentCompleted($event)"
+  (freeCompleted)="onFreePaymentCompleted($event)" (reviewSubmitted)="onReviewSubmitted()" />
+<app-payment-details-dialog [payment]="selectedPayment()" [memberMode]="true" [(visible)]="detailsVisible"
+  (viewInvoice)="viewSelectedInvoice()" />
+<app-member-payment-success [payment]="successfulPayment()" [free]="successfulPaymentWasFree()"
+  [(visible)]="successVisible" (viewPayment)="viewSuccessfulPayment()" (viewMembership)="viewMembership()" />
 @if (invoicePaymentId(); as paymentId) {
-  <app-invoice-dialog [paymentId]="paymentId" [(visible)]="invoiceVisible" />
+<app-invoice-dialog [paymentId]="paymentId" [(visible)]="invoiceVisible" />
 }

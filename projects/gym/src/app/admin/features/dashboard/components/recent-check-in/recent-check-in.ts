@@ -35,4 +35,14 @@ export class RecentCheckIns {
       .join('')
       .toUpperCase();
   }
+
+  relativeTime(value: string): string {
+    const minutes = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 60_000));
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes} min${minutes === 1 ? '' : 's'} ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+    if (hours < 48) return 'Yesterday';
+    return new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
 }

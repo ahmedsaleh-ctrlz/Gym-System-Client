@@ -12,7 +12,7 @@
   </div>
 
   <div class="checkins-list">
-    @for (checkIn of checkIns(); track checkIn.memberId) {
+    @for (checkIn of checkIns(); track checkIn.memberId + '-' + checkIn.checkInAtUtc) {
       <div class="checkin-row">
         <div class="member">
           @if (imageSource(checkIn.imageUrl, checkIn.memberId); as image) {
@@ -35,10 +35,12 @@
         </div>
 
         <div class="checkin-time">
-          <span>Check-in</span>
-          <strong>{{ checkIn.checkInAtUtc | date: 'hh:mm a' }}</strong>
+          <strong>{{ relativeTime(checkIn.checkInAtUtc) }}</strong>
+          <span>{{ checkIn.checkInAtUtc | date: 'MMM d · h:mm a' }}</span>
         </div>
       </div>
+    } @empty {
+      <div class="checkins-empty">No check-ins recorded recently.</div>
     }
   </div>
 </div>

@@ -1,195 +1,472 @@
-<div class="dashboard">
-  <!-- Header -->
+<main class="dashboard">
   <header class="dashboard-header">
-    <div class="header-copy">
-      <span class="eyebrow">OVERVIEW</span>
-
+    <div>
+      <span class="eyebrow">GYM OPERATIONS</span>
       <h1>Dashboard</h1>
-
-      <p>Monitor your gym performance and activity at a glance.</p>
+      <p>Your gym’s performance, membership health, and activity at a glance.</p>
     </div>
-
-    <div class="header-actions">
-      <div class="dashboard-live-chip"><span class="live-dot"></span><span>Live overview</span><i class="pi pi-bolt"></i></div>
-      <div class="dashboard-date-chip"><i class="pi pi-calendar"></i><span>Today at a glance</span></div>
-    </div>
+    <div class="date-chip"><i class="pi pi-calendar"></i>{{ now | date: 'EEEE, MMMM d, y' }}</div>
   </header>
 
-  <!-- KPI -->
-  <section class="stats-grid">
-    <app-stat-card
-      title="Total Members"
-      [value]="dashboardState()?.totalMembers?.toString() ?? '0'"
-      icon="pi pi-users"
-    />
-
-    <app-stat-card
-      title="Active Subscriptions"
-      [value]="dashboardState()?.activeSubscriptions?.toString() ?? '0'"
-      icon="pi pi-id-card"
-    />
-
-    <app-stat-card
-      title="Today's Revenue"
-      [value]="
-        (dashboardState()?.todayRevenue ?? 0 | currency: 'EGP' : 'symbol' : '1.0-0') ?? 'EGP 0'
-      "
-      icon="pi pi-wallet"
-    />
-
-    <app-stat-card
-      title="Today's Attendance"
-      [value]="dashboardState()?.todayAttendanceCount?.toString() ?? '0'"
-      icon="pi pi-sign-in"
-    />
-  </section>
-
-  <!-- Charts -->
-  <section class="charts-grid">
-    <app-revenue-chart [data]="dashboardState()?.revenue ?? []" />
-
-    <app-attendance-chart [data]="dashboardState()?.attendance ?? []" />
-  </section>
-
-  <!-- Analytics -->
-  <section class="analytics-grid">
-    <!-- Subscription Overview -->
-    <article class="dashboard-card subscription-card">
-      <div class="card-header">
-        <div>
-          <span class="eyebrow">MEMBERSHIP</span>
-          <h2>Subscription Overview</h2>
-        </div>
+  <section class="overview" aria-label="Gym overview">
+    <article class="hero-stat">
+      <div class="hero-stat__top">
+        <span class="stat-icon members-icon"><i class="pi pi-users"></i></span
+        ><span class="stat-label">TOTAL MEMBERS</span>
       </div>
-
-      <div class="subscription-content">
-        <div class="subscription-highlight">
-          <div class="highlight-icon">
-            <i class="pi pi-chart-pie"></i>
-          </div>
-
-          <div>
-            <span>Active subscriptions</span>
-
-            <strong>
-              {{ dashboardState()?.activeSubscriptions ?? 0 }}
-            </strong>
-          </div>
-        </div>
-
-        <div class="subscription-list">
-          <div class="subscription-item">
-            <div class="item-label">
-              <span class="status-dot active"></span>
-              <span>Active</span>
-            </div>
-
-            <strong>
-              {{ dashboardState()?.activeSubscriptions ?? 0 }}
-            </strong>
-          </div>
-
-          <div class="subscription-item">
-            <div class="item-label">
-              <span class="status-dot frozen"></span>
-              <span>Frozen</span>
-            </div>
-
-            <strong>
-              {{ dashboardState()?.frozenSubscriptions ?? 0 }}
-            </strong>
-          </div>
-
-          <div class="subscription-item">
-            <div class="item-label">
-              <span class="status-dot scheduled"></span>
-              <span>Scheduled</span>
-            </div>
-
-            <strong>
-              {{ dashboardState()?.scheduledSubscriptions ?? 0 }}
-            </strong>
-          </div>
-
-          <div class="subscription-item">
-            <div class="item-label">
-              <span class="status-dot expired"></span>
-              <span>Expired</span>
-            </div>
-
-            <strong>
-              {{ dashboardState()?.expiredSubscriptions ?? 0 }}
-            </strong>
-          </div>
-        </div>
-      </div>
+      @if (statsLoading()) {
+        <div class="skeleton-value"></div>
+      } @else if (statsError()) {
+        <button class="retry-link" (click)="loadOverview()">Could not load · Retry</button>
+      } @else {
+        <strong class="hero-value">{{ stats()?.totalMembers | number }}</strong>
+      }
+      <span class="stat-footnote">Across all memberships</span>
     </article>
 
-    <!-- Payments -->
-    <article class="dashboard-card payments-card">
-      <div class="card-header">
+    <article class="hero-stat hero-stat--accent">
+      <div class="hero-stat__top">
+        <span class="stat-icon subscription-icon"><i class="pi pi-id-card"></i></span
+        ><span class="stat-label">ACTIVE SUBSCRIPTIONS</span>
+      </div>
+      @if (statsLoading()) {
+        <div class="skeleton-value"></div>
+      } @else if (statsError()) {
+        <button class="retry-link" (click)="loadOverview()">Could not load · Retry</button>
+      } @else {
+        <strong class="hero-value">{{ stats()?.activeSubscriptions | number }}</strong>
+      }
+      <span class="stat-footnote"
+        ><b>{{ stats()?.expiringSubscriptionsNext7Days ?? '—' }}</b> expiring in the next 7
+        days</span
+      >
+    </article>
+
+    <article class="hero-stat hero-stat--revenue">
+      <div class="hero-stat__top">
+        <span class="stat-icon revenue-icon"><i class="pi pi-wallet"></i></span
+        ><span class="stat-label">REVENUE THIS MONTH</span>
+      </div>
+      @if (statsLoading()) {
+        <div class="skeleton-value"></div>
+      } @else if (statsError()) {
+        <button class="retry-link" (click)="loadOverview()">Could not load · Retry</button>
+      } @else {
+        <strong class="hero-value">{{
+          stats()?.thisMonthRevenue | currency: 'EGP' : 'symbol' : '1.0-0'
+        }}</strong>
+        <span
+          class="growth-pill"
+          [class]="'growth-pill ' + growthClass(stats()?.revenueGrowthPercentage ?? 0)"
+          ><i [class]="growthIcon(stats()?.revenueGrowthPercentage ?? 0)"></i
+          >{{ stats()?.revenueGrowthPercentage | number: '1.0-1' }}%
+          <small>vs last month</small></span
+        >
+      }
+    </article>
+
+    <div class="overview-stack">
+      <article class="mini-stat">
+        <span class="mini-stat__icon attendance-icon"><i class="pi pi-sign-in"></i></span>
+        <div>
+          <span class="stat-label">TODAY’S CHECK-INS</span
+          ><strong>{{ statsLoading() ? '—' : (stats()?.todayAttendanceCount | number) }}</strong>
+        </div>
+      </article>
+      <article class="mini-stat">
+        <span class="mini-stat__icon plan-icon"><i class="pi pi-star-fill"></i></span>
+        <div class="plan-mini">
+          <span class="stat-label">MOST POPULAR PLAN</span
+          ><strong>{{ stats()?.mostPopularPlan ?? (statsLoading() ? 'Loading…' : '—') }}</strong
+          ><small>{{ stats()?.mostPopularPlanSubscriptionsCount ?? '—' }} subscriptions</small>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="analytics-grid" aria-label="Revenue and attendance analytics">
+    <article class="panel chart-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">REVENUE</span>
+          <h2>Revenue analytics</h2>
+          <p>
+            {{
+              revenuePeriod() === 'Month'
+                ? 'Daily performance for this month'
+                : 'Monthly performance for this year'
+            }}
+          </p>
+        </div>
+        <div class="segmented-control" role="group" aria-label="Revenue period">
+          <button
+            [class.selected]="revenuePeriod() === 'Month'"
+            (click)="setRevenuePeriod('Month')"
+          >
+            Month
+          </button>
+          <button [class.selected]="revenuePeriod() === 'Year'" (click)="setRevenuePeriod('Year')">
+            Year
+          </button>
+        </div>
+      </div>
+      @if (revenueLoading()) {
+        <div class="chart-skeleton"></div>
+      } @else if (revenueError()) {
+        <div class="section-error">
+          <i class="pi pi-chart-line"></i><span>Revenue data couldn’t be loaded.</span
+          ><button (click)="loadRevenue()">Retry</button>
+        </div>
+      } @else if (!revenue()?.data?.length) {
+        <div class="empty-state">No revenue activity for this period yet.</div>
+      } @else {
+        <div class="chart-summary">
+          <div>
+            <span>{{ revenuePeriod() === 'Month' ? 'This month' : 'This year' }}</span
+            ><strong>{{
+              revenue()?.currentPeriodRevenue | currency: 'EGP' : 'symbol' : '1.0-0'
+            }}</strong>
+          </div>
+          <div>
+            <span>Previous {{ revenuePeriod() === 'Month' ? 'month' : 'year' }}</span
+            ><strong class="muted-value">{{
+              revenue()?.previousPeriodRevenue | currency: 'EGP' : 'symbol' : '1.0-0'
+            }}</strong>
+          </div>
+          <div
+            class="growth-pill"
+            [class]="'growth-pill ' + growthClass(revenue()?.growthPercentage ?? 0)"
+          >
+            <i [class]="growthIcon(revenue()?.growthPercentage ?? 0)"></i
+            >{{ revenue()?.growthPercentage | number: '1.0-1' }}%
+            <small>{{ periodLabel(revenuePeriod()) }}</small>
+          </div>
+        </div>
+        <div class="chart-wrap chart-wrap--revenue">
+          <p-chart type="line" [data]="revenueChartData()" [options]="revenueChartOptions" />
+        </div>
+      }
+    </article>
+
+    <article class="panel chart-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">ATTENDANCE</span>
+          <h2>Member check-ins</h2>
+          <p>
+            {{
+              attendancePeriod() === 'Month'
+                ? 'Daily visits for this month'
+                : 'Monthly visits for this year'
+            }}
+          </p>
+        </div>
+        <div class="segmented-control" role="group" aria-label="Attendance period">
+          <button
+            [class.selected]="attendancePeriod() === 'Month'"
+            (click)="setAttendancePeriod('Month')"
+          >
+            Month
+          </button>
+          <button
+            [class.selected]="attendancePeriod() === 'Year'"
+            (click)="setAttendancePeriod('Year')"
+          >
+            Year
+          </button>
+        </div>
+      </div>
+      @if (attendanceLoading()) {
+        <div class="chart-skeleton"></div>
+      } @else if (attendanceError()) {
+        <div class="section-error">
+          <i class="pi pi-chart-bar"></i><span>Attendance data couldn’t be loaded.</span
+          ><button (click)="loadAttendance()">Retry</button>
+        </div>
+      } @else if (!attendance()?.data?.length) {
+        <div class="empty-state">No check-ins recorded for this period yet.</div>
+      } @else {
+        <div class="chart-summary">
+          <div>
+            <span>{{ attendancePeriod() === 'Month' ? 'This month' : 'This year' }}</span
+            ><strong>{{ attendance()?.currentPeriodAttendance | number }}</strong>
+          </div>
+          <div>
+            <span>Previous {{ attendancePeriod() === 'Month' ? 'month' : 'year' }}</span
+            ><strong class="muted-value">{{
+              attendance()?.previousPeriodAttendance | number
+            }}</strong>
+          </div>
+          <div
+            class="growth-pill"
+            [class]="'growth-pill ' + growthClass(attendance()?.growthPercentage ?? 0)"
+          >
+            <i [class]="growthIcon(attendance()?.growthPercentage ?? 0)"></i
+            >{{ attendance()?.growthPercentage | number: '1.0-2' }}%
+            <small>{{ periodLabel(attendancePeriod()) }}</small>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <p-chart type="bar" [data]="attendanceChartData()" [options]="attendanceChartOptions" />
+        </div>
+        <div class="attendance-foot">
+          <span
+            >Daily average
+            <strong>{{ attendance()?.averageDailyAttendance | number: '1.0-1' }}</strong></span
+          ><span
+            >Peak hour <strong>{{ attendance()?.peakHour | number: '2.0-0' }}:00</strong>
+            <small>· {{ attendance()?.peakHourAttendanceCount }} visits</small></span
+          >
+        </div>
+      }
+    </article>
+  </section>
+
+  <div class="section-divider"><span>BUSINESS HEALTH</span><i></i></div>
+  <section class="health-grid" aria-label="Business health">
+    <article class="panel membership-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">MEMBERS</span>
+          <h2>Membership growth</h2>
+        </div>
+        <span class="heading-icon"><i class="pi pi-users"></i></span>
+      </div>
+      @if (membersLoading()) {
+        <div class="compact-skeleton"></div>
+      } @else if (membersError()) {
+        <div class="section-error compact-error">
+          <span>Members summary couldn’t be loaded.</span
+          ><button (click)="loadMembers()">Retry</button>
+        </div>
+      } @else {
+        <div class="membership-total">
+          <strong>{{ members()?.newMembersThisMonth | number }}</strong
+          ><span>new members this month</span>
+        </div>
+        <div class="comparison-box">
+          <div>
+            <span class="comparison-dot previous"></span><span>Previous month</span
+            ><strong>{{ members()?.newMembersPreviousMonth }}</strong>
+          </div>
+        </div>
+        <div class="comparison-visual">
+          <span [style.width.%]="memberGrowthWidth()"></span><i></i>
+        </div>
+      }
+    </article>
+
+    <article class="panel subscriptions-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">SUBSCRIPTIONS</span>
+          <h2>Subscription health</h2>
+        </div>
+        <span class="heading-icon"><i class="pi pi-id-card"></i></span>
+      </div>
+      @if (subscriptionsLoading()) {
+        <div class="compact-skeleton"></div>
+      } @else if (subscriptionsError()) {
+        <div class="section-error compact-error">
+          <span>Subscription summary couldn’t be loaded.</span
+          ><button (click)="loadSubscriptions()">Retry</button>
+        </div>
+      } @else {
+        <div class="subscription-overview">
+          <div class="donut-wrap">
+            <p-chart
+              type="doughnut"
+              [data]="subscriptionChartData()"
+              [options]="subscriptionChartOptions"
+            />
+            <div class="donut-center">
+              <strong>{{ subscriptions()?.activeSubscriptions | number }}</strong
+              ><small>active</small>
+            </div>
+          </div>
+          <div class="subscription-legend">
+            <div>
+              <i class="legend-dot active"></i><span>Active</span
+              ><strong>{{ subscriptions()?.activeSubscriptions }}</strong>
+            </div>
+            <div>
+              <i class="legend-dot frozen"></i><span>Frozen</span
+              ><strong>{{ subscriptions()?.frozenSubscriptions }}</strong>
+            </div>
+            <div>
+              <i class="legend-dot scheduled"></i><span>Scheduled</span
+              ><strong>{{ subscriptions()?.scheduledSubscriptions }}</strong>
+            </div>
+            <div>
+              <i class="legend-dot expired"></i><span>Expired</span
+              ><strong>{{ subscriptions()?.expiredSubscriptions }}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="subscription-bottom">
+          <div>
+            <span>New this month</span
+            ><strong>{{ subscriptions()?.newSubscriptionsThisMonth }}</strong
+            ><small>vs {{ subscriptions()?.newSubscriptionsPreviousMonth }} last month</small>
+          </div>
+          <div>
+            <span>Expiring soon</span
+            ><strong
+              >{{ subscriptions()?.expiringSubscriptionsNext7Days }} <small>7 days</small></strong
+            ><small>{{ subscriptions()?.expiringSubscriptionsNext30Days }} in 30 days</small>
+          </div>
+          <div>
+            <span>Expired this month</span
+            ><strong>{{ subscriptions()?.expiredSubscriptionsThisMonth }}</strong>
+          </div>
+        </div>
+      }
+    </article>
+
+    <article class="panel payments-panel">
+      <div class="panel-heading">
         <div>
           <span class="eyebrow">PAYMENTS</span>
-          <h2>Payment Overview</h2>
+          <h2>Payments health</h2>
         </div>
+        <span class="heading-icon"><i class="pi pi-wallet"></i></span>
       </div>
-
-      <div class="payment-grid">
-        <div class="payment-stat paid">
-          <div class="payment-icon">
-            <i class="pi pi-check-circle"></i>
-          </div>
-
+      @if (paymentsLoading()) {
+        <div class="compact-skeleton"></div>
+      } @else if (paymentsError()) {
+        <div class="section-error compact-error">
+          <span>Payments summary couldn’t be loaded.</span
+          ><button (click)="loadPayments()">Retry</button>
+        </div>
+      } @else {
+        <div class="review-callout">
+          <span class="review-icon"><i class="pi pi-eye"></i></span>
           <div>
-            <span>Paid</span>
-
-            <strong>
-              {{ dashboardState()?.paidPaymentsCount ?? 0 }}
-            </strong>
+            <strong>{{ payments()?.underReviewPaymentsCount }} need review</strong
+            ><small
+              >{{
+                payments()?.underReviewPaymentsAmount | currency: 'EGP' : 'symbol' : '1.0-0'
+              }}
+              awaiting admin action</small
+            >
           </div>
+          <span class="callout-arrow pi pi-arrow-up-right"></span>
         </div>
-
-        <div class="payment-stat pending">
-          <div class="payment-icon">
-            <i class="pi pi-clock"></i>
-          </div>
-
+        <div class="payment-bars">
           <div>
-            <span>Pending</span>
-
-            <strong>
-              {{ dashboardState()?.pendingPaymentsCount ?? 0 }}
-            </strong>
+            <span>Pending</span><strong>{{ payments()?.pendingPaymentsCount }}</strong
+            ><i
+              ><b
+                class="pending-bar"
+                [style.width.%]="paymentPercent(payments()?.pendingPaymentsCount ?? 0)"
+              ></b
+            ></i>
+          </div>
+          <div>
+            <span>Under review</span><strong>{{ payments()?.underReviewPaymentsCount }}</strong
+            ><i
+              ><b
+                class="review-bar"
+                [style.width.%]="paymentPercent(payments()?.underReviewPaymentsCount ?? 0)"
+              ></b
+            ></i>
+          </div>
+          <div>
+            <span>Paid</span><strong>{{ payments()?.paidPaymentsCount }}</strong
+            ><i
+              ><b
+                class="paid-bar"
+                [style.width.%]="paymentPercent(payments()?.paidPaymentsCount ?? 0)"
+              ></b
+            ></i>
           </div>
         </div>
-      </div>
-
-      <div class="popular-plan">
-        <div class="plan-icon">
-          <i class="pi pi-star-fill"></i>
+        <div class="payment-statuses">
+          <span
+            ><i class="legend-dot failed"></i>Failed
+            <b>{{ payments()?.failedPaymentsCount }}</b></span
+          ><span
+            ><i class="legend-dot rejected"></i>Rejected
+            <b>{{ payments()?.rejectedPaymentsCount }}</b></span
+          ><span
+            ><i class="legend-dot refunded"></i>Refunded
+            <b>{{ payments()?.refundedPaymentsCount }}</b></span
+          ><span
+            ><i class="legend-dot cancelled"></i>Cancelled
+            <b>{{ payments()?.cancelledPaymentsCount }}</b></span
+          >
         </div>
-
-        <div class="plan-content">
-          <span>Most popular plan</span>
-
-          <strong>
-            {{ dashboardState()?.mostPopularPlan || '—' }}
-          </strong>
+        <div class="payment-amounts">
+          <span
+            >Pending amount
+            <strong>{{
+              payments()?.pendingPaymentsAmount | currency: 'EGP' : 'symbol' : '1.0-0'
+            }}</strong></span
+          ><span
+            >Under review
+            <strong>{{
+              payments()?.underReviewPaymentsAmount | currency: 'EGP' : 'symbol' : '1.0-0'
+            }}</strong></span
+          >
         </div>
-
-        <div class="plan-count">
-          <strong>
-            {{ dashboardState()?.mostPopularPlanSubscriptionsCount ?? 0 }}
-          </strong>
-
-          <span>subscriptions</span>
-        </div>
-      </div>
+      }
     </article>
   </section>
 
-  <!-- Recent Activity -->
-  <section class="recent-checkins">
-    <app-recent-check-ins [checkIns]="dashboardState()?.recentCheckIns ?? []" />
+  <section class="bottom-grid" aria-label="Plan performance and recent activity">
+    <article class="panel plans-panel">
+      <div class="panel-heading">
+        <div>
+          <span class="eyebrow">PLAN PERFORMANCE</span>
+          <h2>Plans at a glance</h2>
+          <p>Compare demand and revenue across your plans.</p>
+        </div>
+      </div>
+      @if (plansLoading()) {
+        <div class="chart-skeleton chart-skeleton--short"></div>
+      } @else if (plansError()) {
+        <div class="section-error">
+          <i class="pi pi-chart-bar"></i><span>Plan performance couldn’t be loaded.</span
+          ><button (click)="loadPlans()">Retry</button>
+        </div>
+      } @else if (!plans()?.plans?.length) {
+        <div class="empty-state">Plan performance will appear once subscriptions are recorded.</div>
+      } @else {
+        <div class="plan-highlights">
+          <div>
+            <span class="highlight-revenue"><i class="pi pi-chart-line"></i></span
+            ><small>Highest revenue plan</small><strong>{{ plans()?.highestRevenuePlan }}</strong
+            ><span>{{ plans()?.highestPlanRevenue | currency: 'EGP' : 'symbol' : '1.0-0' }}</span>
+          </div>
+          <small class="popular-plan-note"
+            ><i class="pi pi-star-fill"></i>Most popular: {{ plans()?.mostPopularPlan }} ·
+            {{ plans()?.mostPopularPlanSubscriptionsCount }} subscriptions</small
+          >
+        </div>
+        <div class="chart-wrap chart-wrap--plans">
+          <p-chart type="bar" [data]="planChartData()" [options]="planChartOptions" />
+        </div>
+      }
+    </article>
+    <section class="activity-panel">
+      @if (checkInsLoading()) {
+        <article class="panel activity-loading">
+          <span class="eyebrow">LIVE ACTIVITY</span>
+          <h2>Recent check-ins</h2>
+          <div class="compact-skeleton"></div>
+        </article>
+      } @else if (checkInsError()) {
+        <article class="panel activity-loading">
+          <span class="eyebrow">LIVE ACTIVITY</span>
+          <h2>Recent check-ins</h2>
+          <div class="section-error compact-error">
+            <span>Recent activity couldn’t be loaded.</span
+            ><button (click)="loadCheckIns()">Retry</button>
+          </div>
+        </article>
+      } @else {
+        <app-recent-check-ins [checkIns]="checkIns()" />
+      }
+    </section>
   </section>
-</div>
+</main>
