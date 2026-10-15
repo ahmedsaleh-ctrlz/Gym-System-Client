@@ -1,0 +1,20 @@
+<p-dialog [visible]="visible()" (onHide)="close()" [modal]="true" [draggable]="false" [resizable]="false" [style]="{ width: '88vw', maxWidth: '1100px' }" header="Revenue analytics">
+  <div class="dialog-content">
+    <div class="toolbar">
+      <div class="segmented-control" role="group" aria-label="Revenue period">
+        <button type="button" [class.selected]="period() === 'Month'" (click)="selectPeriod('Month')">Month</button>
+        <button type="button" [class.selected]="period() === 'Year'" (click)="selectPeriod('Year')">Year</button>
+      </div>
+      <div class="selectors">
+        <select [value]="year()" (change)="selectYear(+$any($event.target).value)">@for (value of years(); track value) { <option [value]="value">{{ value }}</option> }</select>
+        @if (period() === 'Month') { <select [value]="month()" (change)="selectMonth(+$any($event.target).value)">@for (item of months; track item.value) { <option [value]="item.value">{{ item.label }}</option> }</select> }
+      </div>
+    </div>
+    @if (loading()) { <div class="loading-state"><span class="loading-bar"></span><span class="loading-bar short"></span></div> }
+    @else if (error()) { <div class="empty-state"><i class="pi pi-exclamation-circle"></i><span>Revenue analytics could not be loaded.</span><button type="button" (click)="retry()">Retry</button></div> }
+    @else if (summary(); as value) {
+      <div class="metrics"><div><span>{{ period() === 'Month' ? 'This month' : 'This year' }}</span><strong>{{ value.currentPeriodRevenue | currency:'EGP':'symbol':'1.0-0' }}</strong></div><div><span>Previous {{ period() === 'Month' ? 'month' : 'year' }}</span><strong>{{ value.previousPeriodRevenue | currency:'EGP':'symbol':'1.0-0' }}</strong></div><div><span>Change</span><strong [class]="value.growthPercentage >= 0 ? 'positive' : 'negative'">{{ value.growthPercentage | number:'1.0-1' }}%</strong></div></div>
+      <div class="chart-wrap"><p-chart type="line" [data]="chartData()" [options]="chartOptions" /></div>
+    } @else { <div class="empty-state">No revenue data is available for this period.</div> }
+  </div>
+</p-dialog>

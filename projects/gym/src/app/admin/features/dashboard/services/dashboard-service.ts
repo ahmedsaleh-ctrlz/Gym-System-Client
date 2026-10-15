@@ -4,6 +4,7 @@ import { appConfig } from 'config';
 import { Observable } from 'rxjs';
 import {
   AttendanceSummary,
+  AdminAiInsightsResponse,
   DashboardStats,
   MembersSummary,
   PaymentsSummary,
@@ -53,6 +54,10 @@ export class DashboardService {
 
   getRecentCheckIns(): Observable<RecentCheckInsResponse> {
     return this.http.get<RecentCheckInsResponse>(`${this.url}/recent-check-ins`);
+  }
+
+  getAiInsights(): Observable<AdminAiInsightsResponse> {
+    return this.http.get<AdminAiInsightsResponse>(`${this.url}/ai-insights`);
   }
 
   private periodParams(query: PeriodQuery): HttpParams {

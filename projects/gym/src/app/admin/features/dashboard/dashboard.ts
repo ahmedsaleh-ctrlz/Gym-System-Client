@@ -14,9 +14,12 @@ import {
 } from './models/adminDashboardResponse';
 import { DashboardService } from './services/dashboard-service';
 import { RecentCheckIns } from './components/recent-check-in/recent-check-in';
+import { RevenueAnalyticsDialog } from './components/revenue-analytics-dialog/revenue-analytics-dialog';
+import { AttendanceAnalyticsDialog } from './components/attendance-analytics-dialog/attendance-analytics-dialog';
+import { AiInsightsDialog } from './components/ai-insights-dialog/ai-insights-dialog';
 
 @Component({
-  imports: [CurrencyPipe, DatePipe, DecimalPipe, ChartModule, RecentCheckIns],
+  imports: [CurrencyPipe, DatePipe, DecimalPipe, ChartModule, RecentCheckIns, RevenueAnalyticsDialog, AttendanceAnalyticsDialog, AiInsightsDialog],
   selector: 'app-dashboard',
   styleUrl: './dashboard.scss',
   templateUrl: './dashboard.html',
@@ -31,6 +34,9 @@ export class Dashboard {
   readonly selectedMonth = signal(this.now.getMonth() + 1);
   readonly revenuePeriod = signal<DashboardPeriod>('Month');
   readonly attendancePeriod = signal<DashboardPeriod>('Month');
+  readonly revenueAnalyticsVisible = signal(false);
+  readonly attendanceAnalyticsVisible = signal(false);
+  readonly aiInsightsVisible = signal(false);
 
   readonly stats = signal<DashboardStats | null>(null);
   readonly statsLoading = signal(true);
@@ -56,6 +62,9 @@ export class Dashboard {
   readonly checkIns = signal<RecentCheckIn[]>([]);
   readonly checkInsLoading = signal(true);
   readonly checkInsError = signal(false);
+
+  readonly previewRevenue = computed(() => this.latestElapsed(this.revenue()?.data ?? []));
+  readonly previewAttendance = computed(() => this.latestElapsed(this.attendance()?.data ?? []));
 
   readonly subscriptionChartData = computed(() => {
     const summary = this.subscriptions();
@@ -143,15 +152,14 @@ export class Dashboard {
   };
 
   readonly revenueChartData = computed(() => {
-    const summary = this.revenue();
     return {
-      labels: (summary?.data ?? []).map((point) =>
+      labels: this.previewRevenue().map((point) =>
         this.formatPeriodLabel(point.date, this.revenuePeriod()),
       ),
       datasets: [
         {
           label: 'Revenue',
-          data: (summary?.data ?? []).map((point) => point.amount),
+          data: this.previewRevenue().map((point) => point.amount),
           fill: true,
           tension: 0.35,
           borderColor: '#4f46e5',
@@ -192,13 +200,13 @@ export class Dashboard {
   };
 
   readonly attendanceChartData = computed(() => ({
-    labels: (this.attendance()?.data ?? []).map((point) =>
+    labels: this.previewAttendance().map((point) =>
       this.formatPeriodLabel(point.date, this.attendancePeriod()),
     ),
     datasets: [
       {
         label: 'Check-ins',
-        data: (this.attendance()?.data ?? []).map((point) => point.count),
+        data: this.previewAttendance().map((point) => point.count),
         backgroundColor: 'rgba(14, 165, 233, 0.78)',
         hoverBackgroundColor: '#0284c7',
         borderRadius: 6,
@@ -293,6 +301,13 @@ export class Dashboard {
     this.attendancePeriod.set(period);
     this.loadAttendance();
   }
+
+  openRevenueAnalytics(): void { this.revenueAnalyticsVisible.set(true); }
+  closeRevenueAnalytics(): void { this.revenueAnalyticsVisible.set(false); }
+  openAttendanceAnalytics(): void { this.attendanceAnalyticsVisible.set(true); }
+  closeAttendanceAnalytics(): void { this.attendanceAnalyticsVisible.set(false); }
+  openAiInsights(): void { this.aiInsightsVisible.set(true); }
+  closeAiInsights(): void { this.aiInsightsVisible.set(false); }
   loadRevenue(): void {
     this.load(
       this.dashboardService.getRevenueSummary(this.periodQuery(this.revenuePeriod())),
@@ -350,6 +365,18 @@ export class Dashboard {
     return period === 'Year'
       ? new Intl.DateTimeFormat('en', { month: 'short' }).format(date)
       : new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short' }).format(date);
+  }
+
+  private latestElapsed<T extends { date: string }>(points: T[]): T[] {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    return [...points]
+      .filter((point) => {
+        const date = new Date(`${point.date}${point.date.length === 10 ? 'T00:00:00' : ''}`);
+        return !Number.isNaN(date.getTime()) && date.getTime() <= today.getTime();
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(-7);
   }
   private periodQuery(period: DashboardPeriod) {
     return {

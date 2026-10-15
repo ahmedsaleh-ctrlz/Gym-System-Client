@@ -60,6 +60,7 @@ export interface RevenueSummary {
   previousPeriodRevenue: number;
   growthPercentage: number;
   data: RevenuePoint[];
+  previousPeriodData: RevenuePoint[];
 }
 
 export interface AttendancePoint {
@@ -75,6 +76,31 @@ export interface AttendanceSummary {
   peakHour: number;
   peakHourAttendanceCount: number;
   data: AttendancePoint[];
+  previousPeriodData: AttendancePoint[];
+}
+
+export type AiInsightSeverity = 'positive' | 'neutral' | 'warning' | 'critical';
+export type AiRecommendationPriority = 'low' | 'medium' | 'high';
+
+export interface AdminAiInsight {
+  title: string;
+  description: string;
+  severity: AiInsightSeverity;
+  metric: string | null;
+  comparison: string | null;
+}
+
+export interface AdminAiRecommendation {
+  title: string;
+  description: string;
+  priority: AiRecommendationPriority;
+}
+
+export interface AdminAiInsightsResponse {
+  summary: string;
+  insights: AdminAiInsight[];
+  recommendations: AdminAiRecommendation[];
+  generatedAtUtc: string;
 }
 
 export interface PlanPerformance {

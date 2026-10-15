@@ -5,7 +5,10 @@
       <h1>Dashboard</h1>
       <p>Your gym’s performance, membership health, and activity at a glance.</p>
     </div>
-    <div class="date-chip"><i class="pi pi-calendar"></i>{{ now | date: 'EEEE, MMMM d, y' }}</div>
+    <div class="header-actions">
+      <button type="button" class="ai-button" (click)="openAiInsights()"><i class="pi pi-sparkles"></i> AI insights</button>
+      <div class="date-chip"><i class="pi pi-calendar"></i>{{ now | date: 'EEEE, MMMM d, y' }}</div>
+    </div>
   </header>
 
   <section class="overview" aria-label="Gym overview">
@@ -90,25 +93,9 @@
         <div>
           <span class="eyebrow">REVENUE</span>
           <h2>Revenue analytics</h2>
-          <p>
-            {{
-              revenuePeriod() === 'Month'
-                ? 'Daily performance for this month'
-                : 'Monthly performance for this year'
-            }}
-          </p>
+          <p>Latest seven elapsed days · open the full period view for comparisons.</p>
         </div>
-        <div class="segmented-control" role="group" aria-label="Revenue period">
-          <button
-            [class.selected]="revenuePeriod() === 'Month'"
-            (click)="setRevenuePeriod('Month')"
-          >
-            Month
-          </button>
-          <button [class.selected]="revenuePeriod() === 'Year'" (click)="setRevenuePeriod('Year')">
-            Year
-          </button>
-        </div>
+        <button type="button" class="analytics-link" (click)="openRevenueAnalytics()">View revenue analytics <i class="pi pi-arrow-up-right"></i></button>
       </div>
       @if (revenueLoading()) {
         <div class="chart-skeleton"></div>
@@ -155,26 +142,11 @@
           <h2>Member check-ins</h2>
           <p>
             {{
-              attendancePeriod() === 'Month'
-                ? 'Daily visits for this month'
-                : 'Monthly visits for this year'
+              'Latest seven elapsed days · open the full period view for comparisons.'
             }}
           </p>
         </div>
-        <div class="segmented-control" role="group" aria-label="Attendance period">
-          <button
-            [class.selected]="attendancePeriod() === 'Month'"
-            (click)="setAttendancePeriod('Month')"
-          >
-            Month
-          </button>
-          <button
-            [class.selected]="attendancePeriod() === 'Year'"
-            (click)="setAttendancePeriod('Year')"
-          >
-            Year
-          </button>
-        </div>
+        <button type="button" class="analytics-link" (click)="openAttendanceAnalytics()">View attendance analytics <i class="pi pi-arrow-up-right"></i></button>
       </div>
       @if (attendanceLoading()) {
         <div class="chart-skeleton"></div>
@@ -470,3 +442,7 @@
     </section>
   </section>
 </main>
+
+<app-revenue-analytics-dialog [visible]="revenueAnalyticsVisible()" [initialYear]="selectedYear()" [initialMonth]="selectedMonth()" (closed)="closeRevenueAnalytics()" />
+<app-attendance-analytics-dialog [visible]="attendanceAnalyticsVisible()" [initialYear]="selectedYear()" [initialMonth]="selectedMonth()" (closed)="closeAttendanceAnalytics()" />
+<app-ai-insights-dialog [visible]="aiInsightsVisible()" (closed)="closeAiInsights()" />
