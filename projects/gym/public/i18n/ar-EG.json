@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "overview": "نظرة عامة",
+    "management": "الإدارة",
+    "membership": "العضوية",
+    "account": "الحساب",
+    "sales": "المبيعات",
+    "reports": "التقارير",
+    "preferences": "التفضيلات",
+    "home": "الرئيسية",
+    "more": "المزيد",
+    "myMembership": "عضويتي",
+    "history": "سجل العضوية",
+    "visits": "الزيارات"
+  },
+  "app": {
+    "dashboard": "لوحة التحكم",
+    "members": "الأعضاء",
+    "plans": "الباقات",
+    "subscriptions": "الاشتراكات",
+    "payments": "المدفوعات",
+    "attendance": "الحضور",
+    "offers": "العروض والكوبونات",
+    "preferences": "التفضيلات",
+    "profile": "الملف الشخصي",
+    "security": "الأمان",
+    "signOut": "تسجيل الخروج",
+    "signingOut": "جاري تسجيل الخروج…"
+  },
+  "preferences": {
+    "eyebrow": "تفضيلاتك",
+    "title": "التفضيلات",
+    "description": "خصّص تجربة استخدام الجيم من مكان واحد.",
+    "appearance": {
+      "eyebrow": "المظهر",
+      "title": "السمة",
+      "description": "اختر المظهر المناسب لاستخدامك اليومي.",
+      "light": "الوضع الفاتح",
+      "dark": "الوضع الداكن"
+    },
+    "language": {
+      "eyebrow": "اللغة",
+      "title": "اللغة",
+      "description": "اختر اللغة المستخدمة في جميع أجزاء التطبيق.",
+      "english": "الإنجليزية",
+      "arabic": "العربية (مصر)"
+    },
+    "account": {
+      "eyebrow": "الحساب",
+      "title": "تفضيلات الحساب",
+      "description": "يتم حفظ اختيارات اللغة والسمة لزيارتك القادمة."
+    }
+  },
+  "login": {
+    "eyebrow": "أهلاً بعودتك",
+    "title": "سجّل الدخول إلى حسابك",
+    "description": "أدخل بياناتك للوصول إلى لوحة التحكم.",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "emailPlaceholder": "you@example.com",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "rememberMe": "تذكرني",
+    "signIn": "تسجيل الدخول",
+    "newHere": "جديد هنا؟",
+    "createAccount": "إنشاء حساب",
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "البريد الإلكتروني غير صحيح",
+    "minPassword": "الحد الأدنى 6 أحرف",
+    "languageLabel": "اللغة",
+    "themeLabel": "السمة",
+    "light": "فاتح",
+    "dark": "داكن",
+    "brandEyebrow": "إدارة الجيم",
+    "brandTitleOne": "تدرّب بذكاء.",
+    "brandTitleTwo": "أدر جيمك بكفاءة.",
+    "brandDescription": "كل ما تحتاجه لإدارة الجيم والأعضاء والاشتراكات والأداء في مكان واحد.",
+    "brandFooter": "إدارة أذكى للياقة البدنية",
+    "forgotTitle": "لنساعدك على العودة",
+    "forgotDescription": "أدخل البريد المرتبط بحسابك وسنرسل لك رابط إعادة تعيين آمن.",
+    "sendReset": "أرسل رابط إعادة التعيين",
+    "backToSignIn": "العودة لتسجيل الدخول",
+    "confirmationTitle": "البريد الإلكتروني غير مؤكد",
+    "confirmationDescription": "لم يتم تأكيد بريدك الإلكتروني بعد. راجع صندوق الوارد أو اطلب رسالة تأكيد جديدة.",
+    "resendConfirmation": "إعادة إرسال رسالة التأكيد",
+    "resendAvailable": "إعادة الإرسال متاحة خلال",
+    "cancel": "إلغاء"
+  }
+}

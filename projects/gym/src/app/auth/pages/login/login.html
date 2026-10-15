@@ -3,48 +3,51 @@
     <div class="brand-content">
       <div class="brand-logo">G</div>
 
-      <span class="eyebrow">GYM MANAGEMENT</span>
+      <span class="eyebrow">{{ 'login.brandEyebrow' | translate }}</span>
 
       <h1>
-        Train smarter.<br />
-        Manage better.
+        {{ 'login.brandTitleOne' | translate }}<br />
+        {{ 'login.brandTitleTwo' | translate }}
       </h1>
 
       <p>
-        Everything you need to manage your gym, members, subscriptions and performance in one place.
+        {{ 'login.brandDescription' | translate }}
       </p>
 
       <div class="brand-footer">
         <span class="status-dot"></span>
-        <span>Powering smarter fitness management</span>
+        <span>{{ 'login.brandFooter' | translate }}</span>
       </div>
     </div>
   </section>
   <p-toast [baseZIndex]="99999"></p-toast>
   <section class="login-section">
     <div class="login-container">
+      <div class="login-preferences">
+        <app-preference-controls [compact]="true" />
+      </div>
       <div class="mobile-logo">
         <div class="brand-logo">G</div>
         <span>GYM</span>
       </div>
 
       <div class="login-header">
-        <span class="eyebrow">WELCOME BACK</span>
+        <span class="eyebrow">{{ 'login.eyebrow' | translate }}</span>
 
-        <h2>Sign in to your account</h2>
+        <h2>{{ 'login.title' | translate }}</h2>
 
-        <p>Enter your credentials to access your dashboard.</p>
+        <p>{{ 'login.description' | translate }}</p>
       </div>
 
       <form class="login-form" [formGroup]="LoginForm" (ngSubmit)="submitForm()">
         <div class="field">
-          <label for="email">Email address</label>
+          <label for="email">{{ 'login.email' | translate }}</label>
 
           <input
             id="email"
             type="email"
             pInputText
-            placeholder="you@example.com"
+            [placeholder]="'login.emailPlaceholder' | translate"
             autocomplete="email"
             class="px-2"
             formControlName="email"
@@ -61,9 +64,9 @@
 
         <div class="field">
           <div class="field-label">
-            <label for="password">Password</label>
+            <label for="password">{{ 'login.password' | translate }}</label>
 
-            <button type="button" class="forgot-link" (click)="openForgotPassword()">Forgot password?</button>
+            <button type="button" class="forgot-link" (click)="openForgotPassword()">{{ 'login.forgotPassword' | translate }}</button>
           </div>
 
           <div class="flex justify-center field">
@@ -94,11 +97,11 @@
         <div class="form-options">
           <label class="remember-me">
             <input type="checkbox" />
-            <span>Remember me</span>
+            <span>{{ 'login.rememberMe' | translate }}</span>
           </label>
         </div>
 
-        <p-button label="Sign in" type="submit" styleClass="login-button" fluid="true" />
+      <p-button [label]="'login.signIn' | translate" type="submit" styleClass="login-button" fluid="true" />
       </form>
 
       <p-dialog
@@ -107,21 +110,21 @@
         [draggable]="false"
         [resizable]="false"
         [style]="{ width: 'min(440px, calc(100vw - 2rem))' }"
-        header="Reset your password"
+        [header]="'login.forgotPassword' | translate"
       >
         <form class="forgot-password-dialog" (ngSubmit)="submitForgotPassword()">
           <div class="forgot-password-icon"><i class="pi pi-key"></i></div>
-          <h2>Let’s get you back in</h2>
-          <p>Enter the email connected to your account and we’ll send you a secure reset link.</p>
+          <h2>{{ 'login.forgotTitle' | translate }}</h2>
+          <p>{{ 'login.forgotDescription' | translate }}</p>
           <div class="field">
-            <label for="forgotEmail">Email address</label>
-            <input id="forgotEmail" type="email" pInputText [formControl]="forgotEmail" placeholder="you@example.com" autocomplete="email" />
+            <label for="forgotEmail">{{ 'login.email' | translate }}</label>
+            <input id="forgotEmail" type="email" pInputText [formControl]="forgotEmail" [placeholder]="'login.emailPlaceholder' | translate" autocomplete="email" />
             @if (forgotEmail.invalid && (forgotEmail.dirty || forgotEmail.touched)) {
-              <p-message severity="error" [closable]="false">Enter a valid email address.</p-message>
+              <p-message severity="error" [closable]="false">{{ 'login.invalidEmail' | translate }}</p-message>
             }
           </div>
-          <p-button label="Email me a reset link" icon="pi pi-send" type="submit" [loading]="forgotPasswordLoading()" fluid="true" />
-          <p-button label="Back to sign in" severity="secondary" [text]="true" type="button" (onClick)="showForgotPasswordDialog.set(false)" fluid="true" />
+          <p-button [label]="'login.sendReset' | translate" icon="pi pi-send" type="submit" [loading]="forgotPasswordLoading()" fluid="true" />
+          <p-button [label]="'login.backToSignIn' | translate" severity="secondary" [text]="true" type="button" (onClick)="showForgotPasswordDialog.set(false)" fluid="true" />
         </form>
       </p-dialog>
 
@@ -139,19 +142,18 @@
           </div>
 
           <div class="confirmation-content">
-            <h2>Email not confirmed</h2>
+            <h2>{{ 'login.confirmationTitle' | translate }}</h2>
 
             <p>
-              Your email address hasn't been confirmed yet. Please check your inbox or request a new
-              confirmation email.
+              {{ 'login.confirmationDescription' | translate }}
             </p>
 
             <div class="confirmation-actions">
               <p-button
                 [label]="
                   resendCooldown() > 0
-                    ? 'Resend available in ' + resendCooldown() + 's'
-                    : 'Resend confirmation email'
+                    ? ('login.resendAvailable' | translate) + ' ' + resendCooldown() + 's'
+                    : ('login.resendConfirmation' | translate)
                 "
                 icon="pi pi-send"
                 [fluid]="true"
@@ -160,7 +162,7 @@
               />
 
               <p-button
-                label="Cancel"
+                [label]="'login.cancel' | translate"
                 severity="secondary"
                 [text]="true"
                 [fluid]="true"
@@ -173,7 +175,7 @@
 
       <div class="login-footer">
         <span>© 2026 Gym System</span>
-        <span>New here? <a routerLink="/register">Create an account</a></span>
+        <span>{{ 'login.newHere' | translate }} <a routerLink="/register">{{ 'login.createAccount' | translate }}</a></span>
       </div>
     </div>
   </section>

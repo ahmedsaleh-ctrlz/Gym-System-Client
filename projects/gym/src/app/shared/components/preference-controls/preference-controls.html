@@ -1,0 +1,37 @@
+<div class="preference-controls" [class.compact]="compact()">
+  <section class="preference-control" aria-labelledby="language-preference-label">
+    <div class="preference-control__heading">
+      <span class="preference-control__icon"><i class="pi pi-language"></i></span>
+      <div>
+        <span id="language-preference-label" class="preference-control__eyebrow">{{ 'preferences.language.eyebrow' | translate }}</span>
+        @if (!compact()) { <strong>{{ 'preferences.language.title' | translate }}</strong> }
+      </div>
+    </div>
+    <div class="preference-control__options" role="group" [attr.aria-label]="'preferences.language.title' | translate">
+      <button type="button" [class.selected]="language.currentLanguage() === 'en'" (click)="setLanguage('en')" [attr.aria-pressed]="language.currentLanguage() === 'en'">
+        <span class="option-code">EN</span><span>{{ 'preferences.language.english' | translate }}</span>
+      </button>
+      <button type="button" [class.selected]="language.currentLanguage() === 'ar-EG'" (click)="setLanguage('ar-EG')" [attr.aria-pressed]="language.currentLanguage() === 'ar-EG'">
+        <span class="option-code">ع</span><span>{{ 'preferences.language.arabic' | translate }}</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="preference-control" aria-labelledby="theme-preference-label">
+    <div class="preference-control__heading">
+      <span class="preference-control__icon preference-control__icon--purple"><i class="pi pi-palette"></i></span>
+      <div>
+        <span id="theme-preference-label" class="preference-control__eyebrow">{{ 'preferences.appearance.eyebrow' | translate }}</span>
+        @if (!compact()) { <strong>{{ 'preferences.appearance.title' | translate }}</strong> }
+      </div>
+    </div>
+    <div class="preference-control__options" role="group" [attr.aria-label]="'preferences.appearance.title' | translate">
+      <button type="button" [class.selected]="!theme.isDark()" (click)="setTheme('light')" [attr.aria-pressed]="!theme.isDark()">
+        <i class="pi pi-sun"></i><span>{{ 'preferences.appearance.light' | translate }}</span>
+      </button>
+      <button type="button" [class.selected]="theme.isDark()" (click)="setTheme('dark')" [attr.aria-pressed]="theme.isDark()">
+        <i class="pi pi-moon"></i><span>{{ 'preferences.appearance.dark' | translate }}</span>
+      </button>
+    </div>
+  </section>
+</div>

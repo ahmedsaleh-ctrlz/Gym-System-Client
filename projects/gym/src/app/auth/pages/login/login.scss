@@ -172,6 +172,15 @@
   width: min(100%, 430px);
 }
 
+.login-preferences {
+  padding: .7rem;
+  margin-bottom: 1.6rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--p-content-background) 88%, transparent);
+  box-shadow: 0 .8rem 2rem rgb(15 23 42 / 6%);
+}
+
 .mobile-logo {
   display: none;
 }

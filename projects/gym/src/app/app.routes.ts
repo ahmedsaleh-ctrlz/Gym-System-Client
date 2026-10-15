@@ -71,6 +71,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./admin/features/attendance/attendance').then((m) => m.AttendancePage),
       },
+      {
+        path: 'preferences',
+        loadComponent: () => import('./shared/pages/preferences/preferences').then((m) => m.Preferences),
+      },
+      {
+        path: 'settings',
+        redirectTo: 'preferences',
+        pathMatch: 'full',
+      },
     ],
   },
 
@@ -124,7 +133,12 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
-        loadComponent: () => import('./member/features/settings/settings').then((m) => m.Settings),
+        redirectTo: 'preferences',
+        pathMatch: 'full',
+      },
+      {
+        path: 'preferences',
+        loadComponent: () => import('./shared/pages/preferences/preferences').then((m) => m.Preferences),
       },
     ],
   },

@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "overview": "Overview",
+    "management": "Management",
+    "membership": "Membership",
+    "account": "Account",
+    "sales": "Sales",
+    "reports": "Reports",
+    "preferences": "Preferences",
+    "home": "Home",
+    "more": "More",
+    "myMembership": "My membership",
+    "history": "Membership history",
+    "visits": "Visits"
+  },
+  "app": {
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "plans": "Plans",
+    "subscriptions": "Subscriptions",
+    "payments": "Payments",
+    "attendance": "Attendance",
+    "offers": "Offers & Coupons",
+    "preferences": "Preferences",
+    "profile": "Profile",
+    "security": "Security",
+    "signOut": "Sign out",
+    "signingOut": "Signing out…"
+  },
+  "preferences": {
+    "eyebrow": "YOUR PREFERENCES",
+    "title": "Preferences",
+    "description": "Personalize your gym experience from one place.",
+    "appearance": {
+      "eyebrow": "APPEARANCE",
+      "title": "Theme",
+      "description": "Choose the appearance that feels right for your daily work.",
+      "light": "Light mode",
+      "dark": "Dark mode"
+    },
+    "language": {
+      "eyebrow": "LANGUAGE",
+      "title": "Language",
+      "description": "Choose the language used throughout the application.",
+      "english": "English",
+      "arabic": "Arabic (Egypt)"
+    },
+    "account": {
+      "eyebrow": "ACCOUNT",
+      "title": "Account preferences",
+      "description": "Your language and theme choices are saved for your next visit."
+    }
+  },
+  "login": {
+    "eyebrow": "WELCOME BACK",
+    "title": "Sign in to your account",
+    "description": "Enter your credentials to access your dashboard.",
+    "email": "Email address",
+    "password": "Password",
+    "emailPlaceholder": "you@example.com",
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "signIn": "Sign in",
+    "newHere": "New here?",
+    "createAccount": "Create an account",
+    "required": "This field is required",
+    "invalidEmail": "Invalid email",
+    "minPassword": "Minimum length is 6 characters",
+    "languageLabel": "Language",
+    "themeLabel": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "brandEyebrow": "GYM MANAGEMENT",
+    "brandTitleOne": "Train smarter.",
+    "brandTitleTwo": "Manage better.",
+    "brandDescription": "Everything you need to manage your gym, members, subscriptions and performance in one place.",
+    "brandFooter": "Powering smarter fitness management",
+    "forgotTitle": "Let’s get you back in",
+    "forgotDescription": "Enter the email connected to your account and we’ll send you a secure reset link.",
+    "sendReset": "Email me a reset link",
+    "backToSignIn": "Back to sign in",
+    "confirmationTitle": "Email not confirmed",
+    "confirmationDescription": "Your email address hasn’t been confirmed yet. Please check your inbox or request a new confirmation email.",
+    "resendConfirmation": "Resend confirmation email",
+    "resendAvailable": "Resend available in",
+    "cancel": "Cancel"
+  }
+}

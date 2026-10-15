@@ -23,6 +23,10 @@ import { MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { DialogModule } from 'primeng/dialog';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { AppLanguage, LanguageService } from '../../../core/services/language.service';
+import { ThemeMode, ThemeService } from '../../../core/services/theme.service';
+import { PreferenceControls } from '../../../shared/components/preference-controls/preference-controls';
 
 @Component({
   imports: [
@@ -42,6 +46,8 @@ import { RouterLink } from '@angular/router';
     RippleModule,
     DialogModule,
     ButtonModule,
+    TranslatePipe,
+    PreferenceControls,
   ],
   selector: 'app-login',
   styleUrl: './login.scss',
@@ -54,6 +60,9 @@ export class Login {
   authService = inject(AuthService);
   messageService = inject(MessageService);
   router = inject(Router);
+  readonly language = inject(LanguageService);
+  readonly theme = inject(ThemeService);
+  private readonly translate = inject(TranslateService);
 
   showEmailConfirmationDialog = signal<boolean>(false);
   showForgotPasswordDialog = signal<boolean>(false);
@@ -69,6 +78,9 @@ export class Login {
 
   mask: boolean = true;
 
+  setLanguage(language: AppLanguage): void { this.language.setLanguage(language); }
+  setTheme(theme: ThemeMode): void { this.theme.setTheme(theme); }
+
   isInvalid(controlName: string): boolean {
     const control = this.LoginForm.get(controlName);
     return !!control && control.invalid && (control.dirty || control.touched);
@@ -80,13 +92,13 @@ export class Login {
       return '';
     }
     if (control.errors['required']) {
-      return 'This field is required';
+      return this.translate.instant('login.required');
     }
     if (control.errors['email']) {
-      return 'Invalid email';
+      return this.translate.instant('login.invalidEmail');
     }
     if (control.errors['minlength']) {
-      return 'Minimum length is 6 characters';
+      return this.translate.instant('login.minPassword');
     }
     return 'Invalid value';
   }

@@ -9,13 +9,13 @@ import { IdCard } from '@primeicons/angular/id-card';
 import { Wallet } from '@primeicons/angular/wallet';
 import { CalendarClock } from '@primeicons/angular/calendar-clock';
 import { ChartLine } from '@primeicons/angular/chart-line';
-import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
 import { NotificationCenter } from '../../shared/components/notification-center/notification-center';
 import { NotificationCenterService } from '../../core/services/notification-center.service';
 import { ToastModule } from 'primeng/toast';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  imports: [RouterOutlet, RouterLinkActive, RouterLink, ThemeToggle, NotificationCenter, ToastModule],
+  imports: [RouterOutlet, RouterLinkActive, RouterLink, NotificationCenter, ToastModule, TranslatePipe],
   selector: 'app-admin-layout',
   styleUrl: './admin-layout.scss',
   templateUrl: './admin-layout.html',

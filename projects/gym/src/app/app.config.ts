@@ -7,6 +7,8 @@ import Aura from '@primeuix/themes/aura';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from 'auth';
 import { MessageService } from 'primeng/api';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,6 +16,11 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
     MessageService,
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({ prefix: '/i18n/', suffix: '.json' }),
+      fallbackLang: 'en',
+      lang: 'en',
+    }),
     providePrimeNG({
       theme: {
       preset: Aura,
