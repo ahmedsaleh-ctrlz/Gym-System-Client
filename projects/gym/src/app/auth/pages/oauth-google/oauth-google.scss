@@ -1,0 +1,15 @@
+:host { display: block; min-height: 100vh; }
+.oauth-page { min-height: 100vh; display: grid; grid-template-columns: .9fr 1.1fr; background: var(--p-surface-ground); color: var(--p-text-color); }
+.oauth-brand { display: flex; flex-direction: column; justify-content: center; padding: 4rem; background: var(--p-surface-900); color: var(--p-surface-0); }
+.brand-logo { display: grid; place-items: center; width: 50px; height: 50px; margin-bottom: 2.5rem; border-radius: 15px; background: var(--p-primary-color); color: var(--p-primary-contrast-color); font-size: 1.35rem; font-weight: 800; }
+.eyebrow { color: var(--p-text-muted-color); font-size: .7rem; font-weight: 800; letter-spacing: .14em; }
+.oauth-brand .eyebrow { color: var(--p-surface-300); }
+.oauth-brand h1 { max-width: 470px; margin: .9rem 0 1rem; font-size: clamp(2.4rem, 4vw, 4.5rem); line-height: 1; letter-spacing: -.055em; }
+.oauth-brand p { max-width: 420px; color: var(--p-surface-300); line-height: 1.7; }
+.oauth-card { align-self: center; width: min(100% - 3rem, 600px); margin: 0 auto; padding: 2.4rem; border: 1px solid var(--p-content-border-color); border-radius: 22px; background: var(--p-content-background); box-shadow: var(--p-card-shadow); }
+.oauth-header { margin-bottom: 1.8rem; }.oauth-header h2, .state-panel h2 { margin: .6rem 0 .55rem; font-size: 2rem; letter-spacing: -.04em; }.oauth-header p, .state-panel p { margin: 0; color: var(--p-text-muted-color); line-height: 1.65; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }.field { display: flex; flex-direction: column; gap: .45rem; }.field label { font-size: .78rem; font-weight: 650; }.field input { width: 100%; box-sizing: border-box; min-height: 46px; }.field p-message { font-size: .7rem; }
+.submit-button { width: 100%; min-height: 48px; margin-top: 1.4rem; border: 0; border-radius: 11px; background: var(--p-primary-color); color: var(--p-primary-contrast-color); font-weight: 700; }.text-button { display: block; margin: 1rem auto 0; padding: .2rem; border: 0; background: transparent; color: var(--p-text-muted-color); cursor: pointer; }.text-button:hover { color: var(--p-primary-color); }
+.state-panel { text-align: center; }.state-icon { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 1.2rem; border-radius: 19px; background: color-mix(in srgb, var(--p-primary-color) 12%, transparent); color: var(--p-primary-color); font-size: 1.5rem; }
+@media (max-width: 850px) { .oauth-page { grid-template-columns: 1fr; }.oauth-brand { padding: 2.5rem 1.5rem; }.oauth-brand h1 { font-size: 2.7rem; }.oauth-card { width: min(100% - 2rem, 600px); margin: 1.5rem auto 2rem; } }
+@media (max-width: 520px) { .oauth-card { padding: 1.4rem; }.form-grid { grid-template-columns: 1fr; }.oauth-header h2, .state-panel h2 { font-size: 1.65rem; } }

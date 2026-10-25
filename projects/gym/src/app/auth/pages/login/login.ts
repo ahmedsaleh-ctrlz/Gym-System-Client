@@ -81,6 +81,10 @@ export class Login {
   setLanguage(language: AppLanguage): void { this.language.setLanguage(language); }
   setTheme(theme: ThemeMode): void { this.theme.setTheme(theme); }
 
+  continueWithGoogle(): void {
+    this.authService.startGoogleLogin();
+  }
+
   isInvalid(controlName: string): boolean {
     const control = this.LoginForm.get(controlName);
     return !!control && control.invalid && (control.dirty || control.touched);

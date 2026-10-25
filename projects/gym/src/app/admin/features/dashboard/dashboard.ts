@@ -63,8 +63,8 @@ export class Dashboard {
   readonly checkInsLoading = signal(true);
   readonly checkInsError = signal(false);
 
-  readonly previewRevenue = computed(() => this.latestElapsed(this.revenue()?.data ?? []));
-  readonly previewAttendance = computed(() => this.latestElapsed(this.attendance()?.data ?? []));
+  readonly previewRevenue = computed(() => this.elapsedPoints(this.revenue()?.data ?? []));
+  readonly previewAttendance = computed(() => this.elapsedPoints(this.attendance()?.data ?? []));
 
   readonly subscriptionChartData = computed(() => {
     const summary = this.subscriptions();
@@ -367,7 +367,7 @@ export class Dashboard {
       : new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short' }).format(date);
   }
 
-  private latestElapsed<T extends { date: string }>(points: T[]): T[] {
+  private elapsedPoints<T extends { date: string }>(points: T[]): T[] {
     const today = new Date();
     today.setHours(23, 59, 59, 999);
     return [...points]
@@ -376,7 +376,6 @@ export class Dashboard {
         return !Number.isNaN(date.getTime()) && date.getTime() <= today.getTime();
       })
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .slice(-7);
   }
   private periodQuery(period: DashboardPeriod) {
     return {

@@ -1,4 +1,4 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpContextToken, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, finalize, Observable, shareReplay, switchMap, throwError } from 'rxjs';
 import { AuthService } from './auth-service';
@@ -7,7 +7,12 @@ import { TokenService } from './token-storage';
 
 let refreshTokenRequest$: Observable<LoginResponse> | null = null;
 
+export const SKIP_AUTH = new HttpContextToken<boolean>(() => false);
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  if (req.context.get(SKIP_AUTH)) {
+    return next(req);
+  }
   const tokenService = inject(TokenService);
   const authService = inject(AuthService);
 

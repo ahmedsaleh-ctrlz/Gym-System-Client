@@ -18,14 +18,15 @@
         <span class="status-dot"></span>
         <span>{{ 'login.brandFooter' | translate }}</span>
       </div>
+
+      <div class="login-preferences login-preferences--brand">
+        <app-preference-controls [compact]="true" />
+      </div>
     </div>
   </section>
   <p-toast [baseZIndex]="99999"></p-toast>
   <section class="login-section">
     <div class="login-container">
-      <div class="login-preferences">
-        <app-preference-controls [compact]="true" />
-      </div>
       <div class="mobile-logo">
         <div class="brand-logo">G</div>
         <span>GYM</span>
@@ -103,6 +104,16 @@
 
       <p-button [label]="'login.signIn' | translate" type="submit" styleClass="login-button" fluid="true" />
       </form>
+
+      <div class="login-divider"><span>{{ 'login.orContinueWith' | translate }}</span></div>
+      <button type="button" class="google-login-button" (click)="continueWithGoogle()">
+        <span class="google-mark" aria-hidden="true">G</span>
+        <span>{{ 'login.continueWithGoogle' | translate }}</span>
+      </button>
+
+      <div class="login-preferences login-preferences--mobile">
+        <app-preference-controls [compact]="true" />
+      </div>
 
       <p-dialog
         [(visible)]="showForgotPasswordDialog"

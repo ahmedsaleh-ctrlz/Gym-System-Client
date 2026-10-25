@@ -1,0 +1,76 @@
+<main class="oauth-page">
+  <section class="oauth-brand">
+    <div class="brand-logo">G</div>
+    <span class="eyebrow">{{ 'googleOAuth.brandEyebrow' | translate }}</span>
+    <h1>{{ 'googleOAuth.brandTitle' | translate }}</h1>
+    <p>{{ 'googleOAuth.brandDescription' | translate }}</p>
+  </section>
+
+  <section class="oauth-card" aria-live="polite">
+    @if (state() === 'loading') {
+      <div class="state-panel">
+        <div class="state-icon"><i class="pi pi-spin pi-spinner"></i></div>
+        <h2>{{ 'googleOAuth.processingTitle' | translate }}</h2>
+        <p>{{ 'googleOAuth.processingDescription' | translate }}</p>
+      </div>
+    } @else if (state() === 'registration') {
+      <div class="oauth-header">
+        <span class="eyebrow">{{ 'googleOAuth.eyebrow' | translate }}</span>
+        <h2>{{ 'googleOAuth.title' | translate }}</h2>
+        <p>{{ 'googleOAuth.description' | translate }}</p>
+      </div>
+      @if (errorCode()) {
+        <p-message severity="error" [closable]="false">
+          @if (errorCode() === 'rate_limited') { {{ 'googleOAuth.rateLimited' | translate }} }
+          @else { {{ 'googleOAuth.registrationFailed' | translate }} }
+        </p-message>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-grid">
+          <div class="field">
+            <label for="google-first-name">{{ 'googleOAuth.firstName' | translate }}</label>
+            <input id="google-first-name" pInputText formControlName="firstName" autocomplete="given-name" />
+            @if (isInvalid('firstName')) { <p-message severity="error" [closable]="false">{{ error('firstName') | translate }}</p-message> }
+          </div>
+          <div class="field">
+            <label for="google-last-name">{{ 'googleOAuth.lastName' | translate }}</label>
+            <input id="google-last-name" pInputText formControlName="lastName" autocomplete="family-name" />
+            @if (isInvalid('lastName')) { <p-message severity="error" [closable]="false">{{ error('lastName') | translate }}</p-message> }
+          </div>
+          <div class="field">
+            <label for="google-birth-date">{{ 'googleOAuth.dateOfBirth' | translate }}</label>
+            <input id="google-birth-date" type="date" pInputText formControlName="dateOfBirth" [max]="maxBirthDate" autocomplete="bday" />
+            @if (isInvalid('dateOfBirth') || isFutureDate()) { <p-message severity="error" [closable]="false">{{ error('dateOfBirth') | translate }}</p-message> }
+          </div>
+          <div class="field">
+            <label for="google-phone">{{ 'googleOAuth.phoneNumber' | translate }}</label>
+            <input id="google-phone" pInputText formControlName="phoneNumber" autocomplete="tel" />
+            @if (isInvalid('phoneNumber')) { <p-message severity="error" [closable]="false">{{ error('phoneNumber') | translate }}</p-message> }
+          </div>
+        </div>
+        <button pButton type="submit" class="submit-button" [disabled]="submitting()" [loading]="submitting()">
+          {{ 'googleOAuth.complete' | translate }}
+        </button>
+      </form>
+      <button type="button" class="text-button" (click)="cancel()">{{ 'googleOAuth.backToLogin' | translate }}</button>
+    } @else {
+      <div class="state-panel">
+        <div class="state-icon"><i class="pi" [class.pi-info-circle]="state() === 'invalid'" [class.pi-exclamation-circle]="state() === 'error'"></i></div>
+        <h2>{{ (state() === 'error' ? 'googleOAuth.errorTitle' : 'googleOAuth.invalidTitle') | translate }}</h2>
+        <p>
+          @if (errorCode() === 'google_email_not_verified') { {{ 'googleOAuth.emailNotVerified' | translate }} }
+          @else if (errorCode() === 'external_session_expired') { {{ 'googleOAuth.sessionExpired' | translate }} }
+          @else if (errorCode() === 'external_login_info_missing') { {{ 'googleOAuth.sessionExpired' | translate }} }
+          @else if (errorCode() === 'rate_limited') { {{ 'googleOAuth.rateLimited' | translate }} }
+          @else if (errorCode() === 'registration_failed') { {{ 'googleOAuth.registrationFailed' | translate }} }
+          @else if (errorCode() === 'complete_failed') { {{ 'googleOAuth.completeFailed' | translate }} }
+          @else if (errorCode() === 'google_auth_failed') { {{ 'googleOAuth.authFailed' | translate }} }
+          @else { {{ 'googleOAuth.invalidDescription' | translate }} }
+        </p>
+        <button pButton type="button" class="submit-button" (click)="restartGoogle()">{{ 'googleOAuth.continueWithGoogle' | translate }}</button>
+        <button type="button" class="text-button" (click)="cancel()">{{ 'googleOAuth.backToLogin' | translate }}</button>
+      </div>
+    }
+  </section>
+</main>

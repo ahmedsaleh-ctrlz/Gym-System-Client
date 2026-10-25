@@ -6,7 +6,9 @@
       <p>Your gym’s performance, membership health, and activity at a glance.</p>
     </div>
     <div class="header-actions">
-      <button type="button" class="ai-button" (click)="openAiInsights()"><i class="pi pi-sparkles"></i> AI insights</button>
+      <button type="button" class="ai-button" (click)="openAiInsights()">
+        <i class="pi pi-sparkles"></i> AI insights
+      </button>
       <div class="date-chip"><i class="pi pi-calendar"></i>{{ now | date: 'EEEE, MMMM d, y' }}</div>
     </div>
   </header>
@@ -93,9 +95,11 @@
         <div>
           <span class="eyebrow">REVENUE</span>
           <h2>Revenue analytics</h2>
-          <p>Latest seven elapsed days · open the full period view for comparisons.</p>
+          <p>Daily revenue for this period · open the full view for comparisons.</p>
         </div>
-        <button type="button" class="analytics-link" (click)="openRevenueAnalytics()">View revenue analytics <i class="pi pi-arrow-up-right"></i></button>
+        <button type="button" class="analytics-link" (click)="openRevenueAnalytics()">
+          View revenue analytics <i class="pi pi-arrow-up-right"></i>
+        </button>
       </div>
       @if (revenueLoading()) {
         <div class="chart-skeleton"></div>
@@ -141,12 +145,12 @@
           <span class="eyebrow">ATTENDANCE</span>
           <h2>Member check-ins</h2>
           <p>
-            {{
-              'Latest seven elapsed days · open the full period view for comparisons.'
-            }}
+            Daily check-ins for this period · open the full view for comparisons.
           </p>
         </div>
-        <button type="button" class="analytics-link" (click)="openAttendanceAnalytics()">View attendance analytics <i class="pi pi-arrow-up-right"></i></button>
+        <button type="button" class="analytics-link" (click)="openAttendanceAnalytics()">
+          View attendance analytics <i class="pi pi-arrow-up-right"></i>
+        </button>
       </div>
       @if (attendanceLoading()) {
         <div class="chart-skeleton"></div>
@@ -443,6 +447,16 @@
   </section>
 </main>
 
-<app-revenue-analytics-dialog [visible]="revenueAnalyticsVisible()" [initialYear]="selectedYear()" [initialMonth]="selectedMonth()" (closed)="closeRevenueAnalytics()" />
-<app-attendance-analytics-dialog [visible]="attendanceAnalyticsVisible()" [initialYear]="selectedYear()" [initialMonth]="selectedMonth()" (closed)="closeAttendanceAnalytics()" />
+<app-revenue-analytics-dialog
+  [visible]="revenueAnalyticsVisible()"
+  [initialYear]="selectedYear()"
+  [initialMonth]="selectedMonth()"
+  (closed)="closeRevenueAnalytics()"
+/>
+<app-attendance-analytics-dialog
+  [visible]="attendanceAnalyticsVisible()"
+  [initialYear]="selectedYear()"
+  [initialMonth]="selectedMonth()"
+  (closed)="closeAttendanceAnalytics()"
+/>
 <app-ai-insights-dialog [visible]="aiInsightsVisible()" (closed)="closeAiInsights()" />

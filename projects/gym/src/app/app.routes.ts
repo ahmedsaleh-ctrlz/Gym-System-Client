@@ -17,6 +17,11 @@ export const routes: Routes = [
   },
 
   {
+    path: 'oauth-google',
+    loadComponent: () => import('./auth/pages/oauth-google/oauth-google').then((m) => m.GoogleOAuth),
+  },
+
+  {
     path: 'register',
     canActivate: [guestGuard],
     loadComponent: () => import('./auth/pages/register/register').then((m) => m.Register),

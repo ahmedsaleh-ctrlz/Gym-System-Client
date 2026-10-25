@@ -1,14 +1,17 @@
 import { Roles } from './enums/roles';
 import { appConfig } from 'config';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { LoginRequest } from './models/login-request';
 import { LoginResponse } from './models/login-response';
+import { GoogleRegistrationRequest } from './models/google-registration-request';
+import { GoogleLoginOutcome } from './models/google-login-outcome';
 import { RegisterRequest } from './models/register-request';
 import { UploadImageResponse } from './models/upload-image-response';
 import { ResetPasswordRequest } from './models/reset-password-request';
 import { Observable, tap } from 'rxjs';
 import { TokenService } from './token-storage';
+import { SKIP_AUTH } from './auth-interceptor';
 
 import { TokenClaims } from './models/tokenClaims';
 import { jwtDecode } from 'jwt-decode';
@@ -21,6 +24,42 @@ export class AuthService {
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.httpClient
       .post<LoginResponse>(`${appConfig.apiUrl}/Identity/token/generate`, request)
+      .pipe(
+        tap((response) => {
+          this.tokenService.setTokens(response.accessToken, response.refreshToken);
+        }),
+      );
+  }
+
+  startGoogleLogin(): void {
+    window.location.assign(`${appConfig.apiUrl}/auth/external/google`);
+  }
+
+  completeGoogleLogin(): Observable<GoogleLoginOutcome> {
+    return this.httpClient
+      .post<GoogleLoginOutcome>(`${appConfig.apiUrl}/auth/external/google/complete`, {}, {
+        withCredentials: true,
+        context: new HttpContext().set(SKIP_AUTH, true),
+      })
+      .pipe(
+        tap((outcome) => {
+          if (
+            outcome.status === 'Authenticated' &&
+            outcome.tokens?.accessToken &&
+            outcome.tokens.refreshToken
+          ) {
+            this.tokenService.setTokens(outcome.tokens.accessToken, outcome.tokens.refreshToken);
+          }
+        }),
+      );
+  }
+
+  registerGoogleMember(request: GoogleRegistrationRequest): Observable<LoginResponse> {
+    return this.httpClient
+      .post<LoginResponse>(`${appConfig.apiUrl}/auth/external/google/register`, request, {
+        withCredentials: true,
+        context: new HttpContext().set(SKIP_AUTH, true),
+      })
       .pipe(
         tap((response) => {
           this.tokenService.setTokens(response.accessToken, response.refreshToken);
