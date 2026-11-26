@@ -14,6 +14,11 @@
   color: var(--p-text-color);
 }
 
+/* Arabic changes text flow inside the page while the established shell keeps
+   its original sidebar position and responsive geometry. */
+:host-context([dir='rtl']) .admin-shell { direction: ltr; }
+:host-context([dir='rtl']) .admin-shell .main-area { direction: rtl; }
+
 /* =========================
    Sidebar
    ========================= */

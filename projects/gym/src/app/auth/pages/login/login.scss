@@ -100,6 +100,12 @@
   background: var(--p-content-background) !important;
 }
 
+.login-divider { display: flex; align-items: center; gap: .8rem; margin: 1.25rem 0 .9rem; color: var(--p-text-muted-color); font-size: .72rem; }
+.login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: var(--p-content-border-color); }
+.google-login-button { display: flex; align-items: center; justify-content: center; gap: .65rem; width: 100%; min-height: 48px; border: 1px solid var(--p-content-border-color); border-radius: 11px; background: var(--p-content-background); color: var(--p-text-color); font-size: .86rem; font-weight: 650; cursor: pointer; transition: border-color .2s ease, background .2s ease; }
+.google-login-button:hover { border-color: var(--p-primary-color); background: color-mix(in srgb, var(--p-primary-color) 5%, var(--p-content-background)); }
+.google-mark { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #4285f4; font-size: 1.05rem; font-weight: 800; }
+
 .eyebrow {
   display: inline-block;
 
@@ -170,6 +176,15 @@
 
 .login-container {
   width: min(100%, 430px);
+}
+
+.login-preferences {
+  width: min(100%, 460px);
+  margin-top: 1.65rem;
+}
+
+.login-preferences--mobile {
+  display: none;
 }
 
 .mobile-logo {
@@ -405,6 +420,11 @@
   .login-container {
     max-width: 440px;
   }
+
+  .login-preferences--mobile {
+    display: block;
+    margin: 1.5rem 0 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -414,6 +434,10 @@
 
   .mobile-logo {
     margin-bottom: 3rem;
+  }
+
+  .login-preferences--mobile {
+    margin-top: 1.25rem;
   }
 
   .login-header h2 {

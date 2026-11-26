@@ -14,16 +14,16 @@ import { AuthService } from 'auth';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { finalize, filter } from 'rxjs';
-import { ThemeToggle } from '../../shared/components/theme-toggle/theme-toggle';
 import { NotificationCenter } from '../../shared/components/notification-center/notification-center';
 import { NotificationCenterService } from '../../core/services/notification-center.service';
 import { ToastModule } from 'primeng/toast';
 import { MemberProfile } from '../../member/shared/models/member-area.models';
 import { MemberService } from '../../shared/services/member.service';
 import { memberFullName, memberImageUrl, memberInitials } from '../../member/shared/member.helpers';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  imports: [ButtonModule, AvatarModule, RouterOutlet, RouterLink, RouterLinkActive, ThemeToggle, NotificationCenter, ToastModule],
+  imports: [ButtonModule, AvatarModule, RouterOutlet, RouterLink, RouterLinkActive, NotificationCenter, ToastModule, TranslatePipe],
   selector: 'app-member-layout',
   styleUrl: './member-layout.scss',
   templateUrl: './member-layout.html',

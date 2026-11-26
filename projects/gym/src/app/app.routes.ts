@@ -17,6 +17,11 @@ export const routes: Routes = [
   },
 
   {
+    path: 'oauth-google',
+    loadComponent: () => import('./auth/pages/oauth-google/oauth-google').then((m) => m.GoogleOAuth),
+  },
+
+  {
     path: 'register',
     canActivate: [guestGuard],
     loadComponent: () => import('./auth/pages/register/register').then((m) => m.Register),
@@ -71,6 +76,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./admin/features/attendance/attendance').then((m) => m.AttendancePage),
       },
+      {
+        path: 'preferences',
+        loadComponent: () => import('./shared/pages/preferences/preferences').then((m) => m.Preferences),
+      },
+      {
+        path: 'settings',
+        redirectTo: 'preferences',
+        pathMatch: 'full',
+      },
     ],
   },
 
@@ -124,7 +138,12 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
-        loadComponent: () => import('./member/features/settings/settings').then((m) => m.Settings),
+        redirectTo: 'preferences',
+        pathMatch: 'full',
+      },
+      {
+        path: 'preferences',
+        loadComponent: () => import('./shared/pages/preferences/preferences').then((m) => m.Preferences),
       },
     ],
   },

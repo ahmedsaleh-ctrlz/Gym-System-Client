@@ -7,7 +7,7 @@
 
     <nav class="sidebar-nav">
       <div class="nav-section">
-        <div class="nav-section-heading"><span class="nav-section-title">Overview</span><span class="nav-section-line"></span></div>
+        <div class="nav-section-heading"><span class="nav-section-title">{{ 'nav.overview' | translate }}</span><span class="nav-section-line"></span></div>
 
         <a
           routerLink="/admin/dashboard"
@@ -16,75 +16,73 @@
           class="nav-item"
         >
           <i class="pi pi-chart-pie"></i>
-          <span>Dashboard</span>
+          <span>{{ 'app.dashboard' | translate }}</span>
         </a>
       </div>
 
       <div class="nav-section">
-        <div class="nav-section-heading"><span class="nav-section-title">Management</span><span class="nav-section-line"></span></div>
+        <div class="nav-section-heading"><span class="nav-section-title">{{ 'nav.management' | translate }}</span><span class="nav-section-line"></span></div>
 
         <a routerLink="/admin/members" routerLinkActive="active" class="nav-item">
           <i class="pi pi-users"></i>
-          <span>Members</span>
+          <span>{{ 'app.members' | translate }}</span>
         </a>
 
         <a routerLink="/admin/plans" routerLinkActive="active" class="nav-item">
           <i class="pi pi-list-check"></i>
-          <span>Plans</span>
+          <span>{{ 'app.plans' | translate }}</span>
         </a>
 
         <a routerLink="/admin/subscriptions" routerLinkActive="active" class="nav-item">
           <i class="pi pi-id-card"></i>
-          <span>Subscriptions</span>
+          <span>{{ 'app.subscriptions' | translate }}</span>
         </a>
 
         <a routerLink="/admin/attendance" routerLinkActive="active" class="nav-item">
           <i class="pi pi-calendar-clock"></i>
-          <span>Attendance</span>
+          <span>{{ 'app.attendance' | translate }}</span>
         </a>
       </div>
 
       <div class="nav-section">
-        <div class="nav-section-heading"><span class="nav-section-title">Sales</span><span class="nav-section-line"></span></div>
+        <div class="nav-section-heading"><span class="nav-section-title">{{ 'nav.sales' | translate }}</span><span class="nav-section-line"></span></div>
 
         <a routerLink="/admin/payments" routerLinkActive="active" class="nav-item">
           <i class="pi pi-wallet"></i>
-          <span>Payments</span>
+          <span>{{ 'app.payments' | translate }}</span>
         </a>
 
         <a routerLink="/admin/offers" routerLinkActive="active" class="nav-item">
           <i class="pi pi-ticket"></i>
-          <span>Offers &amp; Coupons</span>
+          <span>{{ 'app.offers' | translate }}</span>
         </a>
       </div>
 
       <div class="nav-section">
-        <div class="nav-section-heading"><span class="nav-section-title">Reports</span><span class="nav-section-line"></span></div>
+        <div class="nav-section-heading"><span class="nav-section-title">{{ 'nav.reports' | translate }}</span><span class="nav-section-line"></span></div>
 
         <a routerLink="/admin/reports" routerLinkActive="active" class="nav-item">
           <i class="pi pi-chart-line"></i>
-          <span>Reports</span>
+          <span>{{ 'nav.reports' | translate }}</span>
         </a>
       </div>
 
       <div class="nav-section preferences-section">
-        <div class="nav-section-heading"><span class="nav-section-title">Preferences</span><span class="nav-section-line"></span></div>
-        <app-theme-toggle [embedded]="true" />
+        <div class="nav-section-heading"><span class="nav-section-title">{{ 'nav.preferences' | translate }}</span><span class="nav-section-line"></span></div>
+        <a routerLink="/admin/preferences" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-sliders-h"></i>
+          <span>{{ 'app.preferences' | translate }}</span>
+        </a>
       </div>
     </nav>
 
     <div class="sidebar-bottom">
-      <a routerLink="/admin/settings" class="nav-item">
-        <i class="pi pi-cog"></i>
-        <span>Settings</span>
-      </a>
-
       <button
         type="button"
         class="logout-item"
         [disabled]="loggingOut()"
         (click)="logout()"
-        [attr.aria-label]="loggingOut() ? 'Signing out' : 'Sign out'"
+        [attr.aria-label]="loggingOut() ? ('app.signingOut' | translate) : ('app.signOut' | translate)"
       >
         <span class="logout-icon">
           <i
@@ -95,7 +93,7 @@
           ></i>
         </span>
         <span class="logout-copy">
-          <strong>{{ loggingOut() ? 'Signing out…' : 'Sign out' }}</strong>
+          <strong>{{ loggingOut() ? ('app.signingOut' | translate) : ('app.signOut' | translate) }}</strong>
           <small>{{ loggingOut() ? 'Ending your session' : 'Securely leave admin' }}</small>
         </span>
         <i class="pi pi-arrow-up-right logout-arrow"></i>
@@ -111,37 +109,37 @@
       class="mobile-nav-item"
     >
       <i class="pi pi-chart-pie"></i>
-      <span>Home</span>
+      <span>{{ 'nav.home' | translate }}</span>
     </a>
 
     <a routerLink="/admin/members" routerLinkActive="active" class="mobile-nav-item">
       <i class="pi pi-users"></i>
-      <span>Members</span>
+      <span>{{ 'app.members' | translate }}</span>
     </a>
 
     <a routerLink="/admin/plans" routerLinkActive="active" class="mobile-nav-item">
       <i class="pi pi-list-check"></i>
-      <span>Plans</span>
+      <span>{{ 'app.plans' | translate }}</span>
     </a>
 
     <a routerLink="/admin/payments" routerLinkActive="active" class="mobile-nav-item">
       <i class="pi pi-wallet"></i>
-      <span>Payments</span>
+      <span>{{ 'app.payments' | translate }}</span>
     </a>
 
     <a routerLink="/admin/offers" routerLinkActive="active" class="mobile-nav-item">
       <i class="pi pi-ticket"></i>
-      <span>Offers</span>
+      <span>{{ 'app.offers' | translate }}</span>
     </a>
 
     <a routerLink="/admin/attendance" routerLinkActive="active" class="mobile-nav-item">
       <i class="pi pi-calendar-clock"></i>
-      <span>Attendance</span>
+      <span>{{ 'app.attendance' | translate }}</span>
     </a>
 
     <button type="button" class="mobile-nav-item">
       <i class="pi pi-ellipsis-h"></i>
-      <span>More</span>
+      <span>{{ 'nav.more' | translate }}</span>
     </button>
   </nav>
 

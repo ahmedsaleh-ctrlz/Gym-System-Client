@@ -35,6 +35,42 @@
   margin-bottom: 1.4rem;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+}
+
+.ai-button,
+.analytics-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  border: 1px solid color-mix(in srgb, var(--p-primary-color) 28%, var(--p-content-border-color));
+  border-radius: 9px;
+  padding: .55rem .75rem;
+  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--p-primary-color) 6%, var(--p-content-background));
+  cursor: pointer;
+  font: inherit;
+  font-size: .7rem;
+  font-weight: 700;
+}
+
+.ai-button:hover,
+.analytics-link:hover {
+  background: color-mix(in srgb, var(--p-primary-color) 11%, var(--p-content-background));
+}
+
+.analytics-link {
+  flex: 0 0 auto;
+  padding: .45rem .6rem;
+  border-color: var(--p-content-border-color);
+  color: var(--p-text-muted-color);
+  background: var(--p-content-background);
+  font-size: .65rem;
+}
+
 .eyebrow,
 .stat-label {
   color: var(--p-text-muted-color);
@@ -247,30 +283,6 @@
   background: var(--p-content-hover-background);
 }
 
-.segmented-control {
-  display: inline-flex;
-  gap: 0.15rem;
-  padding: 0.2rem;
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 9px;
-  background: var(--p-content-hover-background);
-}
-.segmented-control button {
-  padding: 0.38rem 0.58rem;
-  border: 0;
-  border-radius: 7px;
-  color: var(--p-text-muted-color);
-  background: transparent;
-  font: inherit;
-  font-size: 0.65rem;
-  cursor: pointer;
-}
-.segmented-control button.selected {
-  color: var(--p-text-color);
-  background: var(--p-content-background);
-  box-shadow: 0 1px 4px rgb(15 23 42 / 10%);
-  font-weight: 700;
-}
 .chart-summary {
   flex-wrap: wrap;
   gap: 0.8rem 1.3rem;
@@ -380,9 +392,6 @@
   border-radius: 50%;
   background: #cbd5e1;
 }
-.comparison-dot.current {
-  background: #4f46e5;
-}
 .comparison-visual {
   height: 6px;
   margin-top: 0.9rem;
@@ -474,11 +483,6 @@
 .subscription-bottom strong {
   font-size: 0.8rem;
 }
-.subscription-bottom strong small {
-  color: #d97706;
-  font-size: 0.57rem;
-  font-weight: 600;
-}
 
 .review-callout {
   gap: 0.6rem;
@@ -508,11 +512,6 @@
 .review-callout small {
   color: #a16207;
   font-size: 0.6rem;
-}
-.callout-arrow {
-  margin-left: auto;
-  color: #b45309;
-  font-size: 0.7rem;
 }
 .payment-bars {
   display: grid;
@@ -620,10 +619,6 @@
   background: #fef3c7;
   font-size: 0.7rem;
 }
-.plan-highlights > div > span.highlight-revenue {
-  color: #047857;
-  background: #d1fae5;
-}
 .plan-highlights small {
   color: var(--p-text-muted-color);
   font-size: 0.58rem;
@@ -726,6 +721,7 @@
     align-items: flex-start;
     flex-direction: column;
   }
+  .header-actions { width: 100%; justify-content: space-between; }
   .date-chip {
     font-size: 0.63rem;
   }

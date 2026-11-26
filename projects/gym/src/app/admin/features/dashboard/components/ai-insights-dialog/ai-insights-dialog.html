@@ -1,0 +1,13 @@
+<p-dialog [visible]="visible()" (onShow)="load()" (onHide)="close()" [modal]="true" [draggable]="false" [resizable]="false" [style]="{ width: 'min(680px, 92vw)' }" header="AI insights">
+  <div class="ai-content">
+    <div class="ai-toolbar"><div><span class="eyebrow">ASSISTED ANALYSIS</span><p>Signals generated from your latest dashboard data.</p></div><button type="button" class="refresh" (click)="refresh()" [disabled]="loading()"><i class="pi pi-refresh"></i> Refresh</button></div>
+    @if (loading()) { <div class="skeletons"><span></span><span></span><span class="short"></span></div> }
+    @else if (error()) { <div class="state"><i class="pi pi-exclamation-circle"></i><strong>Insights are temporarily unavailable.</strong><button type="button" (click)="retry()">Try again</button></div> }
+    @else if (insights(); as value) {
+      <div class="summary"><i class="pi pi-sparkles"></i><p>{{ value.summary }}</p></div>
+      <section><div class="section-title"><h3>What stands out</h3><span>{{ value.insights.length }} signals</span></div><div class="insight-list">@for (insight of value.insights; track insight.title) { <article class="insight" [class]="'insight--' + insight.severity"><div class="insight-icon"><i [class]="severityIcon(insight.severity)"></i></div><div><strong>{{ insight.title }}</strong><p>{{ insight.description }}</p>@if (insight.metric || insight.comparison) { <small>{{ insight.metric }}<span>{{ insight.comparison }}</span></small> }</div></article> } @empty { <div class="muted">No insights were returned for this period.</div> }</div></section>
+      <section><div class="section-title"><h3>Recommended actions</h3><span>{{ value.recommendations.length }} actions</span></div><div class="recommendation-list">@for (recommendation of value.recommendations; track recommendation.title) { <article class="recommendation"><span [class]="'priority priority--' + recommendation.priority">{{ recommendation.priority }}</span><div><strong>{{ recommendation.title }}</strong><p>{{ recommendation.description }}</p></div></article> } @empty { <div class="muted">No recommendations were returned.</div> }</div></section>
+      <footer>Generated {{ value.generatedAtUtc | date:'medium' }}</footer>
+    } @else { <div class="state"><i class="pi pi-sparkles"></i><span>Open the insights panel to analyze the latest data.</span></div> }
+  </div>
+</p-dialog>

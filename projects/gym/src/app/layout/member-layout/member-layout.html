@@ -7,60 +7,59 @@
 
     <nav class="member-navigation" aria-label="Member navigation">
       <section class="member-nav-section">
-        <div class="member-nav-section-heading"><span class="member-nav-section-title">Overview</span><span class="member-nav-section-line"></span></div>
+        <div class="member-nav-section-heading"><span class="member-nav-section-title">{{ 'nav.overview' | translate }}</span><span class="member-nav-section-line"></span></div>
         <a
           class="member-nav-item"
           routerLink="/member/dashboard"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <i class="pi pi-home"></i><span>Dashboard</span>
+          <i class="pi pi-home"></i><span>{{ 'app.dashboard' | translate }}</span>
         </a>
       </section>
 
       <section class="member-nav-section">
-        <div class="member-nav-section-heading"><span class="member-nav-section-title">Membership</span><span class="member-nav-section-line"></span></div>
+        <div class="member-nav-section-heading"><span class="member-nav-section-title">{{ 'nav.membership' | translate }}</span><span class="member-nav-section-line"></span></div>
         <a
           class="member-nav-item"
           routerLink="/member/membership"
           routerLinkActive="active"
           [routerLinkActiveOptions]="{ exact: true }"
         >
-          <i class="pi pi-id-card"></i><span>My membership</span>
+          <i class="pi pi-id-card"></i><span>{{ 'nav.myMembership' | translate }}</span>
         </a>
         <a class="member-nav-item" routerLink="/member/plans" routerLinkActive="active">
-          <i class="pi pi-sparkles"></i><span>Plans</span>
+          <i class="pi pi-sparkles"></i><span>{{ 'app.plans' | translate }}</span>
         </a>
         <a class="member-nav-item" routerLink="/member/membership/history" routerLinkActive="active">
-          <i class="pi pi-history"></i><span>Membership history</span>
+          <i class="pi pi-history"></i><span>{{ 'nav.history' | translate }}</span>
         </a>
         <a class="member-nav-item" routerLink="/member/attendance" routerLinkActive="active">
-          <i class="pi pi-calendar-clock"></i><span>Attendance</span>
+          <i class="pi pi-calendar-clock"></i><span>{{ 'app.attendance' | translate }}</span>
         </a>
         <a class="member-nav-item" routerLink="/member/payments" routerLinkActive="active">
-          <i class="pi pi-wallet"></i><span>Payments</span>
+          <i class="pi pi-wallet"></i><span>{{ 'app.payments' | translate }}</span>
         </a>
       </section>
 
       <section class="member-nav-section">
-        <div class="member-nav-section-heading"><span class="member-nav-section-title">Account</span><span class="member-nav-section-line"></span></div>
+        <div class="member-nav-section-heading"><span class="member-nav-section-title">{{ 'nav.account' | translate }}</span><span class="member-nav-section-line"></span></div>
         <a class="member-nav-item" routerLink="/member/profile" routerLinkActive="active">
-          <i class="pi pi-user"></i><span>Profile</span>
+          <i class="pi pi-user"></i><span>{{ 'app.profile' | translate }}</span>
         </a>
         <a class="member-nav-item" routerLink="/member/security" routerLinkActive="active">
-          <i class="pi pi-shield"></i><span>Security</span>
+          <i class="pi pi-shield"></i><span>{{ 'app.security' | translate }}</span>
         </a>
-        <a class="member-nav-item" routerLink="/member/settings" routerLinkActive="active">
-          <i class="pi pi-cog"></i><span>Settings</span>
+      </section>
+      <section class="member-nav-section preferences-section">
+        <div class="member-nav-section-heading"><span class="member-nav-section-title">{{ 'nav.preferences' | translate }}</span><span class="member-nav-section-line"></span></div>
+        <a class="member-nav-item" routerLink="/member/preferences" routerLinkActive="active">
+          <i class="pi pi-sliders-h"></i><span>{{ 'app.preferences' | translate }}</span>
         </a>
       </section>
     </nav>
 
     <div class="sidebar-bottom">
-      <div class="preferences">
-        <span class="preferences-title">Preferences</span>
-        <app-theme-toggle [embedded]="true" />
-      </div>
       <button type="button" class="logout-button" [disabled]="loggingOut()" (click)="logout()">
         <i
           class="pi"
@@ -68,7 +67,7 @@
           [class.pi-spin]="loggingOut()"
           [class.pi-spinner]="loggingOut()"
         ></i>
-        <span>{{ loggingOut() ? 'Signing out…' : 'Sign out' }}</span>
+        <span>{{ loggingOut() ? ('app.signingOut' | translate) : ('app.signOut' | translate) }}</span>
       </button>
     </div>
   </aside>
@@ -119,19 +118,19 @@
 
     <nav class="mobile-member-nav" aria-label="Member navigation">
       <a routerLink="/member/dashboard" routerLinkActive="active"
-        ><i class="pi pi-home"></i><span>Home</span></a
+        ><i class="pi pi-home"></i><span>{{ 'nav.home' | translate }}</span></a
       >
       <a routerLink="/member/membership" routerLinkActive="active"
-        ><i class="pi pi-id-card"></i><span>Plan</span></a
+        ><i class="pi pi-id-card"></i><span>{{ 'app.plans' | translate }}</span></a
       >
       <a routerLink="/member/attendance" routerLinkActive="active"
-        ><i class="pi pi-calendar-clock"></i><span>Visits</span></a
+        ><i class="pi pi-calendar-clock"></i><span>{{ 'nav.visits' | translate }}</span></a
       >
       <a routerLink="/member/payments" routerLinkActive="active"
-        ><i class="pi pi-wallet"></i><span>Payments</span></a
+        ><i class="pi pi-wallet"></i><span>{{ 'app.payments' | translate }}</span></a
       >
       <a routerLink="/member/profile" routerLinkActive="active"
-        ><i class="pi pi-user"></i><span>Profile</span></a
+        ><i class="pi pi-user"></i><span>{{ 'app.profile' | translate }}</span></a
       >
     </nav>
   </div>
