@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 import { Observable } from 'rxjs';
 import {
   CreatePromoCodeRequest,
@@ -11,7 +11,8 @@ import {
 @Injectable({ providedIn: 'root' })
 export class PromoCodeService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${appConfig.apiUrl}/promo-codes`;
+  private readonly config = inject(APP_CONFIG);
+  private readonly url = `${this.config.apiUrl}/promo-codes`;
 
   getPromoCodes(isActive: boolean | null = null, search = ''): Observable<PromoCodeResponse[]> {
     const params: Record<string, string> = {};

@@ -13,7 +13,7 @@ import {
   effect,
 } from '@angular/core';
 import { loadStripe, Stripe, StripeCardElement } from '@stripe/stripe-js';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
@@ -42,6 +42,7 @@ export class MemberPaymentCheckout implements OnDestroy {
   private readonly paymentService = inject(PaymentService);
   private readonly promoCodeService = inject(PromoCodeService);
   private readonly subscriptionService = inject(SubscriptionService);
+  private readonly config = inject(APP_CONFIG);
   readonly payment = input<MemberPayment | null>(null);
   readonly visible = model(false);
   readonly completed = output<MemberPayment>();
@@ -350,14 +351,14 @@ export class MemberPaymentCheckout implements OnDestroy {
   }
   private async mountCard(): Promise<void> {
     if (!this.clientSecret || !this.cardHost?.nativeElement) return;
-    if (!appConfig.stripePublishableKey) {
+    if (!this.config.stripePublishableKey) {
       this.paymentError.set(
         'Stripe card payments need a publishable key configured for this environment.',
       );
       return;
     }
     this.destroyCard();
-    this.stripe = await loadStripe(appConfig.stripePublishableKey);
+    this.stripe = await loadStripe(this.config.stripePublishableKey);
     if (!this.stripe) {
       this.paymentError.set('Secure card payment is unavailable right now. Please try again.');
       return;

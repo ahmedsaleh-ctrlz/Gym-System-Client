@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 import { Observable } from 'rxjs';
 import { PageResponse } from '../models/page.models';
 import {
@@ -15,7 +15,8 @@ import {
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${appConfig.apiUrl}/payments`;
+  private readonly config = inject(APP_CONFIG);
+  private readonly url = `${this.config.apiUrl}/payments`;
 
   getPayments(filters: PaymentFilters): Observable<PageResponse<Payment>> {
     let params = new HttpParams()

@@ -1,13 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 import { Observable } from 'rxjs';
 import { AttendancePageResponse, AttendanceRecord } from '../models/attendance.models';
 
 @Injectable({ providedIn: 'root' })
 export class AttendanceApiService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${appConfig.apiUrl}/attendances`;
+  private readonly config = inject(APP_CONFIG);
+  private readonly url = `${this.config.apiUrl}/attendances`;
 
   getAttendances(
     pageNumber = 1,

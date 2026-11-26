@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 import { PageResponse } from '../models/page.models';
 import {
@@ -14,7 +14,8 @@ import {
 @Injectable({ providedIn: 'root' })
 export class SubscriptionService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${appConfig.apiUrl}/subscriptions`;
+  private readonly config = inject(APP_CONFIG);
+  private readonly url = `${this.config.apiUrl}/subscriptions`;
 
   getSubscriptions(filters: SubscriptionFilters): Observable<PageResponse<Subscription>> {
     const terms = filters.searchTerm.trim().split(/\s+/).filter(Boolean);

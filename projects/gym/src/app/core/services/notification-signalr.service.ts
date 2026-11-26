@@ -8,10 +8,11 @@ import {
 } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
 import { AppNotification } from '../models/notification.models';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationSignalRService {
+  private readonly config = inject(APP_CONFIG);
   private readonly tokenService = inject(TokenService);
   private readonly notificationSubject = new Subject<AppNotification>();
   private connection: HubConnection | null = null;
@@ -38,7 +39,7 @@ export class NotificationSignalRService {
     }
 
     const connection = new HubConnectionBuilder()
-      .withUrl(`${appConfig.apiBaseUrl}/hubs/notifications`, {
+      .withUrl(this.config.hubUrl, {
         accessTokenFactory: () => this.tokenService.getAccessToken() ?? '',
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])

@@ -1,13 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 import { map, Observable } from 'rxjs';
 import { AppNotification, NotificationPage } from '../models/notification.models';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationsApiService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${appConfig.apiUrl}/notifications`;
+  private readonly config = inject(APP_CONFIG);
+  private readonly url = `${this.config.apiUrl}/notifications`;
 
   getNotifications(pageNumber = 1, pageSize = 20, isRead?: boolean): Observable<NotificationPage> {
     let params = new HttpParams().set('pageNumber', pageNumber).set('pageSize', pageSize);

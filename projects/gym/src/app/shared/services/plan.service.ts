@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 import { Observable } from 'rxjs';
 import { PageResponse } from '../models/page.models';
 import { CreatePlanRequest, Plan, UpdatePlanRequest } from '../models/plan.models';
@@ -8,7 +8,8 @@ import { CreatePlanRequest, Plan, UpdatePlanRequest } from '../models/plan.model
 @Injectable({ providedIn: 'root' })
 export class PlanService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${appConfig.apiUrl}/plans`;
+  private readonly config = inject(APP_CONFIG);
+  private readonly url = `${this.config.apiUrl}/plans`;
 
   getPlans(
     pageNumber = 1,

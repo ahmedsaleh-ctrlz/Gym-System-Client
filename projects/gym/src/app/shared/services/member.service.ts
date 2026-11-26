@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 import { forkJoin, map, Observable } from 'rxjs';
 import {
   ActiveMember,
@@ -15,7 +15,8 @@ import {
 @Injectable({ providedIn: 'root' })
 export class MemberService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${appConfig.apiUrl}/members`;
+  private readonly config = inject(APP_CONFIG);
+  private readonly url = `${this.config.apiUrl}/members`;
 
   getMe(): Observable<MemberProfile> {
     return this.http.get<MemberProfile>(`${this.url}/me`);

@@ -1,5 +1,5 @@
 import { Roles } from './enums/roles';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { LoginRequest } from './models/login-request';
@@ -17,10 +17,11 @@ import { jwtDecode } from 'jwt-decode';
 export class AuthService {
   httpClient = inject(HttpClient);
   tokenService = inject(TokenService);
+  private readonly config = inject(APP_CONFIG);
 
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.httpClient
-      .post<LoginResponse>(`${appConfig.apiUrl}/Identity/token/generate`, request)
+      .post<LoginResponse>(`${this.config.apiUrl}/Identity/token/generate`, request)
       .pipe(
         tap((response) => {
           this.tokenService.setTokens(response.accessToken, response.refreshToken);
@@ -32,7 +33,7 @@ export class AuthService {
     const refreshToken = this.tokenService.getRefreshToken();
     const accessToken = this.tokenService.getAccessToken();
     return this.httpClient
-      .post<LoginResponse>(`${appConfig.apiUrl}/Identity/token/refresh-token`, {
+      .post<LoginResponse>(`${this.config.apiUrl}/Identity/token/refresh-token`, {
         refreshToken,
         expiredAccessToken: accessToken,
       })
@@ -72,7 +73,7 @@ export class AuthService {
   }
 
   ResendConfirmationEmail(email: string): Observable<void> {
-    return this.httpClient.post<void>(`${appConfig.apiUrlV2}/Identity/resend-confirmation-email`, {
+    return this.httpClient.post<void>(`${this.config.apiUrlV2}/Identity/resend-confirmation-email`, {
       email,
     });
   }
@@ -81,23 +82,23 @@ export class AuthService {
     const formData = new FormData();
     formData.append('file', file);
     return this.httpClient.post<UploadImageResponse>(
-      `${appConfig.apiUrl}/images/UploadImage`,
+      `${this.config.apiUrl}/images/UploadImage`,
       formData,
     );
   }
 
   register(request: RegisterRequest): Observable<void> {
-    return this.httpClient.post<void>(`${appConfig.apiUrlV2}/Identity`, request);
+    return this.httpClient.post<void>(`${this.config.apiUrlV2}/Identity`, request);
   }
 
   forgetPassword(email: string): Observable<void> {
-    return this.httpClient.post<void>(`${appConfig.apiUrl}/Identity/forget-password`, {
+    return this.httpClient.post<void>(`${this.config.apiUrl}/Identity/forget-password`, {
       email: email,
     });
   }
 
   resetPassword(request: ResetPasswordRequest): Observable<void> {
-    return this.httpClient.post<void>(`${appConfig.apiUrl}/Identity/reset-password`, request);
+    return this.httpClient.post<void>(`${this.config.apiUrl}/Identity/reset-password`, request);
   }
 
   updatePassword(request: {
@@ -105,11 +106,11 @@ export class AuthService {
     currentPassword: string;
     newPassword: string;
   }): Observable<void> {
-    return this.httpClient.put<void>(`${appConfig.apiUrl}/Identity/update-password`, request);
+    return this.httpClient.put<void>(`${this.config.apiUrl}/Identity/update-password`, request);
   }
 
   logout(): Observable<void> {
-    return this.httpClient.post<void>(`${appConfig.apiUrl}/Identity/logout`, {
+    return this.httpClient.post<void>(`${this.config.apiUrl}/Identity/logout`, {
       refreshToken: this.tokenService.getRefreshToken() ?? '',
     });
   }

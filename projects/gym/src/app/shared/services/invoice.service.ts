@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { appConfig } from 'config';
+import { APP_CONFIG } from 'config';
 import { Observable } from 'rxjs';
 import { Invoice } from '../models/invoice.models';
 
 @Injectable({ providedIn: 'root' })
 export class InvoiceService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${appConfig.apiUrl}/invoices`;
+  private readonly config = inject(APP_CONFIG);
+  private readonly url = `${this.config.apiUrl}/invoices`;
 
   getInvoice(id: number): Observable<Invoice> {
     return this.http.get<Invoice>(`${this.url}/${id}`);
